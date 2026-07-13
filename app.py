@@ -48,31 +48,21 @@ except FileNotFoundError:
 
 with st.sidebar:
 
+    st.markdown("# 🍽️")
+
     st.markdown(
         """
-        <div class="sidebar-header">
+### Buffet The Padang Pasir
 
-            <div class="sidebar-logo">
-                🍽️
-            </div>
-
-            <div class="sidebar-title">
-                Buffet The Padang Pasir
-            </div>
-
-            <div class="sidebar-subtitle">
-                Analisis Pola Transaksi
-                Shopee Food
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+Analisis Pola Transaksi Shopee Food
+        """
     )
+
+    st.divider()
 
     selected = option_menu(
 
-        menu_title=None,
+        menu_title="Menu",
 
         options=[
             "Home",
@@ -90,20 +80,45 @@ with st.sidebar:
             "download"
         ],
 
-        default_index=0
+        menu_icon="list",
+
+        default_index=0,
+
+        styles={
+
+            "container": {
+                "padding": "0px",
+                "background-color": "#ffffff",
+            },
+
+            "icon": {
+                "color": "#EE4D2D",
+                "font-size": "18px"
+            },
+
+            "nav-link": {
+                "font-size": "15px",
+                "text-align": "left",
+                "margin": "5px 0",
+                "padding": "10px",
+                "border-radius": "10px",
+                "--hover-color": "#FFF3F0",
+            },
+
+            "nav-link-selected": {
+                "background-color": "#EE4D2D",
+                "color": "white",
+            }
+
+        }
 
     )
 
-    st.markdown(
-        """
-        <div class="sidebar-footer">
+    st.divider()
 
-            Versi 1.0
+    st.caption("Buffet The Padang Pasir")
 
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.caption("Versi 1.0")
 
 # =====================================================
 # ROUTING
