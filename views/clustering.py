@@ -462,7 +462,7 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih tinggi.
             rekomendasi_tinggi = [
                 "Prioritaskan proses pelayanan pada transaksi ini.",
                 "Pastikan stok bahan baku selalu tersedia.",
-                "Siapkan bahan makanan sebelum jam sibuk.",
+                "Siapkan bahan makanan.",
                 "Tambahkan tenaga kerja saat volume transaksi meningkat.",
                 "Pantau waktu penyelesaian pesanan agar sesuai estimasi."
             ]
