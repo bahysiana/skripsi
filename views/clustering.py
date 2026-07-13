@@ -456,92 +456,53 @@ acuan dalam proses pengelompokan transaksi.
 
     with right:
 
-        st.markdown(
-            """
-            <div class="cluster-box cluster-normal">
-            <div class="cluster-title">
-            🟩 Transaksi Prioritas Normal
-            </div>
+    st.markdown("""
+<div class="cluster-header-normal">
+    <h3>🟩 Transaksi Prioritas Normal</h3>
+    <p>
+    Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
+    variasi menu, dan waktu pelayanan yang relatif lebih rendah.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-            <div class="cluster-desc">
-            Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
-            variasi menu, dan waktu pelayanan yang relatif lebih rendah.
-            </div>
-            """,
-            unsafe_allow_html=True
+    col_a, col_b = st.columns(2)
+
+    with col_a:
+        st.metric(
+            "Jumlah Transaksi",
+            normal
         )
 
-        # -----------------------------
-        # KPI
-        # -----------------------------
+    with col_b:
+        st.metric(
+            "Persentase",
+            f"{normal_pct:.2f}%"
+        )
 
-        col_a, col_b = st.columns(2)
+    st.markdown("### 📌 Karakteristik")
 
-        with col_a:
-
-            st.markdown(
-                f"""
-                <div class="mini-card">
-                    <div class="mini-number">
-                        {normal}
-                    </div>
-
-                    <div class="mini-title">
-                        Jumlah Transaksi
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        with col_b:
-
-            st.markdown(
-                f"""
-                <div class="mini-card">
-                    <div class="mini-number">
-                        {normal_pct:.2f}%
-                    </div>
-
-                    <div class="mini-title">
-                        Persentase
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        # -----------------------------
-        # KARAKTERISTIK
-        # -----------------------------
-
-        st.markdown("### 📌 Karakteristik")
-
-        st.markdown("""
+    st.markdown("""
 - ✅ Nilai transaksi relatif lebih rendah.
 - ✅ Jumlah pesanan lebih sedikit.
 - ✅ Variasi menu lebih sederhana.
 - ✅ Waktu persiapan relatif lebih singkat.
-- ✅ Dapat diproses menggunakan alur operasional standar.
-        """)
+- ✅ Dapat diproses menggunakan SOP standar.
+""")
 
-        # -----------------------------
-        # REKOMENDASI
-        # -----------------------------
+    st.markdown("### 💡 Rekomendasi")
 
-        st.markdown("### 💡 Rekomendasi")
+    st.success("""
+• Pertahankan kualitas pelayanan.
 
-        st.info("""
-1. Pertahankan kualitas pelayanan yang sudah berjalan.
+• Gunakan SOP yang telah berjalan.
 
-2. Gunakan prosedur operasional standar dalam proses pelayanan.
+• Siapkan bahan baku saat waktu senggang.
 
-3. Manfaatkan waktu senggang untuk menyiapkan bahan baku.
+• Tingkatkan nilai transaksi melalui promosi.
 
-4. Tingkatkan nilai transaksi melalui paket menu atau promosi.
-
-5. Evaluasi menu yang kurang diminati pelanggan sebagai bahan pengembangan produk.
-        """)
+• Evaluasi menu yang kurang diminati.
+""")
 
         st.markdown("</div>", unsafe_allow_html=True)
 
