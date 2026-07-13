@@ -49,6 +49,18 @@ proses clustering.
     normalized_df = st.session_state["normalized_df"]
 
     # ======================================================
+    # SESSION
+    # ======================================================
+
+    if "cluster_df" not in st.session_state:
+
+        st.session_state["cluster_df"] = None
+
+    if "centroid_df" not in st.session_state:
+
+        st.session_state["centroid_df"] = None
+
+    # ======================================================
     # INFORMASI
     # ======================================================
 
@@ -65,76 +77,58 @@ K-Means Clustering.
     # BUTTON
     # ======================================================
 
+    col_btn, col_info = st.columns([1, 5])
+
+    with col_btn:
+
+        mulai = st.button(
+            "🚀 Jalankan",
+            type="primary",
+            use_container_width=True
+        )
+
+    with col_info:
+
+        st.empty()
+
     # ======================================================
-# INISIALISASI SESSION
-# ======================================================
-
-if "cluster_df" not in st.session_state:
-
-    st.session_state["cluster_df"] = None
-
-if "centroid_df" not in st.session_state:
-
-    st.session_state["centroid_df"] = None
-
-# ======================================================
-# BUTTON
-# ======================================================
-
-col_btn, col_info = st.columns([1, 5])
-
-with col_btn:
-
-    mulai = st.button(
-
-        "🚀 Jalankan",
-
-        type="primary",
-
-        use_container_width=True
-
-    )
-
-with col_info:
-
-    st.empty()
+    # PROSES CLUSTERING
+    # ======================================================
 
     if mulai:
 
-    with st.spinner("Sedang melakukan proses clustering..."):
+        with st.spinner(
+            "Sedang melakukan proses clustering..."
+        ):
 
-        result_df, centroid_df = perform_clustering(
+            result_df, centroid_df = perform_clustering(
+                normalized_df,
+                n_clusters=2
+            )
 
-            normalized_df,
+        st.session_state["cluster_df"] = result_df
+        st.session_state["centroid_df"] = centroid_df
 
-            n_clusters=2
-
+        st.success(
+            "Proses clustering berhasil dilakukan."
         )
 
-    st.session_state["cluster_df"] = result_df
-
-    st.session_state["centroid_df"] = centroid_df
-
-    st.success(
-        "Proses clustering berhasil dilakukan."
-    )
     # ======================================================
-# AMBIL HASIL DARI SESSION
-# ======================================================
+    # CEK HASIL
+    # ======================================================
 
-if st.session_state["cluster_df"] is None:
+    if st.session_state["cluster_df"] is None:
 
-    return
+        return
 
-result_df = st.session_state["cluster_df"]
+    result_df = st.session_state["cluster_df"]
 
-centroid_df = st.session_state["centroid_df"]
+    centroid_df = st.session_state["centroid_df"]
 
     # ======================================================
     # RINGKASAN
     # ======================================================
 
-    
     summary = cluster_summary(result_df)
 
     total_data = len(result_df)
@@ -160,50 +154,35 @@ centroid_df = st.session_state["centroid_df"]
     with k1:
 
         st.metric(
-
             "📦 Total Transaksi",
-
             total_data
-
         )
 
     with k2:
 
         st.metric(
-
             "🟧 Beban Pelayanan Tinggi",
-
             tinggi,
-
             f"{tinggi_pct:.2f}%"
-
         )
 
     with k3:
 
         st.metric(
-
             "🟩 Beban Pelayanan Rendah",
-
             normal,
-
             f"{normal_pct:.2f}%"
-
         )
 
     with k4:
 
         st.metric(
-
             "🧠 Jumlah Cluster",
-
             "2"
-
         )
 
     st.divider()
-
-    # ======================================================
+        # ======================================================
     # RINGKASAN ANALISIS
     # ======================================================
 
@@ -212,22 +191,24 @@ centroid_df = st.session_state["centroid_df"]
     st.markdown(
         f"""
 Berdasarkan proses **K-Means Clustering** terhadap
-**{total_data} transaksi**, diperoleh:
+**{total_data} transaksi**, diperoleh hasil sebagai berikut.
 
 - **{tinggi} transaksi ({tinggi_pct:.2f}%)**
-  termasuk kelompok **Beban Pelayanan Tinggi**.
+  termasuk kelompok **Pola Transaksi dengan Beban Pelayanan Tinggi**.
 
 - **{normal} transaksi ({normal_pct:.2f}%)**
-  termasuk kelompok **Beban Pelayanan Rendah**.
+  termasuk kelompok **Pola Transaksi dengan Beban Pelayanan Rendah**.
 
-Pengelompokan ini memberikan gambaran pola transaksi
-yang dapat digunakan sebagai dasar dalam mendukung
-pengambilan keputusan operasional pada Buffet The Padang Pasir.
+Hasil pengelompokan ini memberikan gambaran karakteristik
+transaksi pelanggan yang dapat digunakan sebagai salah satu
+dasar dalam mendukung pengambilan keputusan operasional
+pada Buffet The Padang Pasir.
         """
     )
 
     st.divider()
-        # ======================================================
+
+    # ======================================================
     # VISUALISASI HASIL CLUSTERING
     # ======================================================
 
@@ -236,7 +217,7 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
     col_chart, col_table = st.columns([2, 1])
 
     # ======================================================
-    # GRAFIK DISTRIBUSI
+    # GRAFIK
     # ======================================================
 
     with col_chart:
@@ -335,7 +316,7 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
                 "Beban Pelayanan Tinggi",
 
-                "PBeban Pelayanan Rendah"
+                "Beban Pelayanan Rendah"
 
             ],
 
@@ -370,17 +351,15 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
         st.markdown("### ℹ️ Informasi")
 
         st.info(
-
             """
 Grafik menunjukkan jumlah transaksi
-pada masing-masing cluster hasil
-K-Means Clustering.
+yang termasuk pada masing-masing
+cluster hasil K-Means Clustering.
 
-Semakin tinggi batang grafik,
-semakin banyak transaksi
-yang termasuk dalam cluster tersebut.
+Semakin tinggi jumlah transaksi,
+semakin banyak data yang berada
+pada kelompok tersebut.
             """
-
         )
 
     st.divider()
@@ -395,11 +374,13 @@ yang termasuk dalam cluster tersebut.
 
         st.markdown(
             """
-Centroid merupakan titik pusat dari setiap cluster
-yang dihasilkan oleh algoritma K-Means.
+Centroid merupakan titik pusat
+dari setiap cluster yang dihasilkan
+oleh algoritma K-Means.
 
-Nilai centroid digunakan sebagai acuan
-dalam menentukan karakteristik masing-masing cluster.
+Nilai centroid digunakan sebagai
+acuan dalam menentukan karakteristik
+masing-masing cluster.
             """
         )
 
@@ -414,43 +395,46 @@ dalam menentukan karakteristik masing-masing cluster.
         )
 
     st.divider()
-
-    # ======================================================
+        # ======================================================
     # INTERPRETASI
     # ======================================================
 
     st.subheader("🎯 Interpretasi Hasil Clustering")
 
     left, right = st.columns(2)
-        # ======================================================
-    # TRANSAKSI PRIORITAS TINGGI
+
+    # ======================================================
+    # BEBAN PELAYANAN TINGGI
     # ======================================================
 
     with left:
 
         with st.container(border=True):
 
-            st.markdown("## 🟧 Transaksi Prioritas Tinggi")
+            st.markdown(
+                "## 🟧 Pola Transaksi dengan Beban Pelayanan Tinggi"
+            )
 
             st.caption(
                 """
-Kelompok transaksi yang memiliki karakteristik nilai transaksi,
-jumlah pesanan, dan waktu pelayanan yang relatif lebih tinggi.
+Kelompok transaksi dengan nilai transaksi,
+jumlah pesanan, variasi menu, dan waktu
+persiapan yang relatif lebih tinggi.
                 """
             )
 
             st.divider()
 
-            col1, col2 = st.columns(2)
+            c1, c2 = st.columns(2)
 
-            with col1:
+            with c1:
 
                 st.metric(
                     "Jumlah Transaksi",
                     tinggi
                 )
 
-            with col2:
+            with c2:
 
                 st.metric(
                     "Persentase",
@@ -462,11 +446,15 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih tinggi.
             st.markdown("### 📌 Karakteristik")
 
             karakteristik_tinggi = [
-                "Nilai transaksi cenderung lebih tinggi.",
-                "Jumlah pesanan relatif lebih banyak.",
-                "Variasi menu yang dipesan lebih beragam.",
-                "Waktu persiapan relatif lebih lama.",
-                "Perlu menjadi prioritas saat jam operasional ramai."
+
+                "Nilai transaksi relatif lebih tinggi.",
+
+                "Jumlah pesanan lebih banyak.",
+
+                "Variasi menu lebih beragam.",
+
+                "Waktu persiapan relatif lebih lama."
+
             ]
 
             for item in karakteristik_tinggi:
@@ -478,45 +466,55 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih tinggi.
             st.markdown("### 💡 Rekomendasi")
 
             rekomendasi_tinggi = [
-                "Prioritaskan proses pelayanan pada transaksi ini.",
-                "Pastikan stok bahan baku selalu tersedia.",
-                "Siapkan bahan makanan.",
-                "Tambahkan tenaga kerja saat volume transaksi meningkat.",
-                "Pantau waktu penyelesaian pesanan agar sesuai estimasi."
+
+                "Prioritaskan penanganan transaksi pada kelompok ini agar proses pelayanan tetap optimal.",
+
+                "Pastikan ketersediaan bahan baku untuk menu yang sering muncul pada kelompok transaksi ini.",
+
+                "Lakukan pembagian tugas karyawan secara efektif ketika menangani transaksi dengan beban pelayanan tinggi.",
+
+                "Lakukan pemantauan terhadap waktu persiapan agar tetap sesuai estimasi kepada pelanggan.",
+
+                "Gunakan hasil analisis sebagai dasar evaluasi operasional toko."
+
             ]
 
             for item in rekomendasi_tinggi:
 
                 st.markdown(f"• {item}")
-                    # ======================================================
-    # TRANSAKSI PRIORITAS NORMAL
+
+    # ======================================================
+    # BEBAN PELAYANAN RENDAH
     # ======================================================
 
     with right:
 
         with st.container(border=True):
 
-            st.markdown("## 🟩 Transaksi Prioritas Normal")
+            st.markdown(
+                "## 🟩 Pola Transaksi dengan Beban Pelayanan Rendah"
+            )
 
             st.caption(
                 """
-Kelompok transaksi yang memiliki karakteristik nilai transaksi,
-jumlah pesanan, dan waktu pelayanan yang relatif lebih rendah.
+Kelompok transaksi dengan nilai transaksi,
+jumlah pesanan, variasi menu, dan waktu
+persiapan yang relatif lebih rendah.
                 """
             )
 
             st.divider()
 
-            col1, col2 = st.columns(2)
+            c1, c2 = st.columns(2)
 
-            with col1:
+            with c1:
 
                 st.metric(
                     "Jumlah Transaksi",
                     normal
                 )
 
-            with col2:
+            with c2:
 
                 st.metric(
                     "Persentase",
@@ -527,21 +525,19 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih rendah.
 
             st.markdown("### 📌 Karakteristik")
 
-            karakteristik_normal = [
+            karakteristik_rendah = [
 
                 "Nilai transaksi relatif lebih rendah.",
 
-                "Jumlah pesanan relatif lebih sedikit.",
+                "Jumlah pesanan lebih sedikit.",
 
-                "Variasi menu yang dipesan lebih sederhana.",
+                "Variasi menu lebih sederhana.",
 
-                "Waktu persiapan relatif lebih singkat.",
-
-                "Dapat diproses menggunakan alur operasional standar."
+                "Waktu persiapan relatif lebih singkat."
 
             ]
 
-            for item in karakteristik_normal:
+            for item in karakteristik_rendah:
 
                 st.markdown(f"✅ {item}")
 
@@ -549,41 +545,57 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih rendah.
 
             st.markdown("### 💡 Rekomendasi")
 
-            rekomendasi_normal = [
+            rekomendasi_rendah = [
 
-                "Pertahankan kualitas pelayanan yang sudah berjalan.",
+                "Pertahankan kualitas pelayanan yang telah berjalan.",
 
-                "Gunakan prosedur operasional standar.",
+                "Gunakan prosedur operasional secara konsisten.",
 
-                "Siapkan bahan baku pada waktu senggang.",
+                "Manfaatkan hasil analisis sebagai dasar pengelolaan sumber daya.",
 
-                "Tingkatkan nilai transaksi melalui paket menu atau promosi.",
+                "Evaluasi menu yang kurang diminati sebagai bahan pengembangan produk.",
 
-                "Evaluasi menu yang kurang diminati pelanggan."
+                "Gunakan kelompok transaksi ini sebagai acuan dalam menjaga efisiensi pelayanan."
 
             ]
 
-            for item in rekomendasi_normal:
+            for item in rekomendasi_rendah:
 
                 st.markdown(f"• {item}")
 
     st.divider()
-
-    # ======================================================
+        # ======================================================
     # PROFIL CLUSTER
     # ======================================================
 
     st.subheader("📊 Profil Rata-rata Setiap Cluster")
 
+    st.markdown(
+        """
+Tabel berikut menunjukkan rata-rata nilai setiap variabel
+pada masing-masing cluster hasil proses K-Means Clustering.
+        """
+    )
+
     profile_df = cluster_profile(result_df)
+
+    profile_df = profile_df.rename(
+
+        index={
+
+            0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
+
+            1: "Pola Transaksi dengan Beban Pelayanan Rendah"
+
+        }
+
+    )
 
     st.dataframe(
 
         profile_df,
 
-        use_container_width=True,
-
-        hide_index=False
+        use_container_width=True
 
     )
 
@@ -595,11 +607,20 @@ jumlah pesanan, dan waktu pelayanan yang relatif lebih rendah.
 
     st.success(
         """
-Proses K-Means Clustering berhasil dilakukan.
+Analisis pola transaksi berhasil dilakukan menggunakan
+metode K-Means Clustering.
 
-Hasil pengelompokan transaksi ini dapat digunakan sebagai
-dasar untuk memahami pola transaksi pelanggan serta membantu
-Buffet The Padang Pasir dalam menentukan prioritas pelayanan
-dan pengelolaan operasional berdasarkan karakteristik transaksi.
+Hasil pengelompokan menunjukkan bahwa transaksi Shopee Food
+pada Buffet The Padang Pasir dapat dibedakan menjadi dua
+kelompok berdasarkan karakteristik transaksi, yaitu
+**Pola Transaksi dengan Beban Pelayanan Tinggi**
+dan
+**Pola Transaksi dengan Beban Pelayanan Rendah**.
+
+Hasil analisis ini diharapkan dapat membantu pihak
+Buffet The Padang Pasir dalam memahami karakteristik
+transaksi pelanggan sehingga dapat digunakan sebagai
+salah satu dasar dalam mendukung pengambilan keputusan
+operasional secara lebih terarah.
         """
     )
