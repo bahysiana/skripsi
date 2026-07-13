@@ -1,11 +1,16 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
-from utils.clustering import perform_clustering
+from utils.clustering import (
+    perform_clustering,
+    cluster_summary,
+    cluster_profile
+)
 
 
 # ==========================================================
-# CLUSTERING
+# HALAMAN CLUSTERING
 # ==========================================================
 
 def show_clustering():
@@ -19,7 +24,7 @@ def show_clustering():
     st.caption(
         """
 Analisis pola transaksi Shopee Food menggunakan
-metode K-Means Clustering dengan jumlah cluster (K = 2).
+algoritma K-Means Clustering.
         """
     )
 
@@ -34,7 +39,8 @@ metode K-Means Clustering dengan jumlah cluster (K = 2).
         st.warning(
             """
 Silakan lakukan **Preprocessing**
-terlebih dahulu melalui menu Preprocessing.
+terlebih dahulu sebelum menjalankan
+proses clustering.
             """
         )
 
@@ -49,8 +55,8 @@ terlebih dahulu melalui menu Preprocessing.
     st.info(
         """
 Klik tombol **Jalankan Clustering**
-untuk melakukan proses pengelompokan transaksi
-menggunakan algoritma K-Means.
+untuk mengelompokkan transaksi menjadi
+dua kelompok berdasarkan karakteristik transaksi.
         """
     )
 
@@ -58,25 +64,35 @@ menggunakan algoritma K-Means.
     # BUTTON
     # ======================================================
 
-    if not st.button(
+    col1, col2 = st.columns([1, 5])
 
-        "🚀 Jalankan Clustering",
+    with col1:
 
-        type="primary",
+        mulai = st.button(
 
-        use_container_width=True
+            "🚀 Jalankan",
 
-    ):
+            type="primary",
+
+            use_container_width=True
+
+        )
+
+    with col2:
+
+        st.empty()
+
+    if not mulai:
 
         return
 
     # ======================================================
-    # PROSES CLUSTERING
+    # PROSES KMEANS
     # ======================================================
 
-    with st.spinner("Sedang melakukan clustering..."):
+    with st.spinner("Sedang melakukan proses clustering..."):
 
-        cluster_df, centroid_df = perform_clustering(
+        result_df, centroid_df = perform_clustering(
 
             normalized_df,
 
@@ -84,63 +100,25 @@ menggunakan algoritma K-Means.
 
         )
 
-    st.success("Clustering berhasil dilakukan.")
+    st.success(
+        "Proses clustering berhasil dilakukan."
+    )
 
     # ======================================================
     # SIMPAN SESSION
     # ======================================================
 
-    st.session_state["cluster_df"] = cluster_df
+    st.session_state["cluster_df"] = result_df
 
     st.session_state["centroid_df"] = centroid_df
 
     # ======================================================
-    # RINGKASAN CLUSTER
+    # RINGKASAN
     # ======================================================
 
-    summary = (
+    summary = cluster_summary(result_df)
 
-        cluster_df["Cluster"]
-
-        .value_counts()
-
-        .sort_index()
-
-        .reset_index()
-
-    )
-
-    summary.columns = [
-
-        "Cluster",
-
-        "Jumlah"
-
-    ]
-
-    total_data = len(cluster_df)
-
-    summary["Persentase"] = (
-
-        summary["Jumlah"]
-
-        / total_data
-
-        * 100
-
-    ).round(2)
-
-    # ======================================================
-    # NAMA CLUSTER
-    # ======================================================
-
-    summary["Kategori"] = [
-
-        "Transaksi Prioritas Tinggi",
-
-        "Transaksi Prioritas Normal"
-
-    ]
+    total_data = len(result_df)
 
     tinggi = int(summary.iloc[0]["Jumlah"])
 
@@ -152,79 +130,130 @@ menggunakan algoritma K-Means.
 
     st.divider()
         # ======================================================
-    # RINGKASAN ANALISIS
+    # DASHBOARD KPI
     # ======================================================
 
-    st.subheader("📌 Ringkasan Hasil Analisis")
+    st.subheader("📌 Ringkasan Hasil Clustering")
 
-    st.info(
+    st.markdown(
         f"""
-Dari **{total_data} transaksi** yang dianalisis menggunakan metode
-**K-Means Clustering**, diperoleh:
+        <div class="dashboard-row">
 
-- **{tinggi} transaksi ({tinggi_pct:.2f}%)** termasuk kategori **Transaksi Prioritas Tinggi**.
-- **{normal} transaksi ({normal_pct:.2f}%)** termasuk kategori **Transaksi Prioritas Normal**.
+            <div class="dashboard-card">
 
-Hasil ini dapat digunakan sebagai dasar dalam menentukan prioritas pelayanan
-dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
-"""
+                <div class="dashboard-icon">📦</div>
+
+                <div class="dashboard-value">
+                    {total_data}
+                </div>
+
+                <div class="dashboard-label">
+                    Total Transaksi
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon orange">
+                    🟧
+                </div>
+
+                <div class="dashboard-value">
+                    {tinggi}
+                </div>
+
+                <div class="dashboard-label">
+                    Prioritas Tinggi
+                </div>
+
+                <div class="dashboard-percent">
+                    {tinggi_pct:.2f}%
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon green">
+                    🟩
+                </div>
+
+                <div class="dashboard-value">
+                    {normal}
+                </div>
+
+                <div class="dashboard-label">
+                    Prioritas Normal
+                </div>
+
+                <div class="dashboard-percent">
+                    {normal_pct:.2f}%
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-icon">
+                    🧠
+                </div>
+
+                <div class="dashboard-value">
+                    2
+                </div>
+
+                <div class="dashboard-label">
+                    Jumlah Cluster
+                </div>
+
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     st.divider()
 
     # ======================================================
-    # KPI CARD
+    # RINGKASAN ANALISIS
     # ======================================================
 
-    st.subheader("📊 Statistik Clustering")
+    st.subheader("📖 Ringkasan Analisis")
 
-    col1, col2, col3, col4 = st.columns(4)
+    st.markdown(
+        f"""
+Berdasarkan hasil proses **K-Means Clustering**, sebanyak
+**{total_data} transaksi** berhasil dikelompokkan menjadi
+**2 kelompok transaksi**.
 
-    with col1:
+- 🟧 **Transaksi Prioritas Tinggi** berjumlah **{tinggi} transaksi**
+  atau sekitar **{tinggi_pct:.2f}%** dari seluruh data.
 
-        st.metric(
-            label="📦 Total Transaksi",
-            value=total_data
-        )
+- 🟩 **Transaksi Prioritas Normal** berjumlah **{normal} transaksi**
+  atau sekitar **{normal_pct:.2f}%** dari seluruh data.
 
-    with col2:
-
-        st.metric(
-            label="🟧 Prioritas Tinggi",
-            value=tinggi,
-            delta=f"{tinggi_pct:.2f}%"
-        )
-
-    with col3:
-
-        st.metric(
-            label="🟩 Prioritas Normal",
-            value=normal,
-            delta=f"{normal_pct:.2f}%"
-        )
-
-    with col4:
-
-        st.metric(
-            label="🧠 Jumlah Cluster",
-            value="2"
-        )
+Informasi ini memberikan gambaran mengenai pola transaksi
+yang dapat digunakan sebagai dasar dalam menentukan prioritas
+pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
+        """
+    )
 
     st.divider()
-
-    # ======================================================
-    # GRAFIK DAN TABEL
-    # ======================================================
-
-    left, right = st.columns([1.7, 1])
-
-    # ======================================================
-    # GRAFIK
+        # ======================================================
+    # VISUALISASI CLUSTER
     # ======================================================
 
-    with left:
+    st.subheader("📈 Visualisasi Hasil Clustering")
 
-        st.subheader("📈 Distribusi Hasil Clustering")
+    col_chart, col_table = st.columns([2, 1])
+
+    # ======================================================
+    # GRAFIK BAR
+    # ======================================================
+
+    with col_chart:
 
         chart_df = pd.DataFrame({
 
@@ -246,8 +275,6 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
         })
 
-        import plotly.express as px
-
         fig = px.bar(
 
             chart_df,
@@ -260,11 +287,13 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
             color="Kategori",
 
+            color="Kategori",
+
             color_discrete_map={
 
-                "Prioritas Tinggi": "#ff7a00",
+                "Prioritas Tinggi": "#F57C00",
 
-                "Prioritas Normal": "#34a853"
+                "Prioritas Normal": "#43A047"
 
             }
 
@@ -272,21 +301,33 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
         fig.update_layout(
 
-            height=420,
-
-            showlegend=False,
+            height=430,
 
             plot_bgcolor="white",
 
             paper_bgcolor="white",
 
-            title=None
+            showlegend=False,
+
+            margin=dict(
+
+                l=20,
+
+                r=20,
+
+                t=30,
+
+                b=20
+
+            )
 
         )
 
         fig.update_traces(
 
-            textposition="outside"
+            textposition="outside",
+
+            marker_line_width=0
 
         )
 
@@ -299,14 +340,14 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
         )
 
     # ======================================================
-    # RINGKASAN CLUSTER
+    # TABEL RINGKASAN
     # ======================================================
 
-    with right:
+    with col_table:
 
-        st.subheader("📋 Ringkasan Cluster")
+        st.markdown("### 📋 Ringkasan")
 
-        ringkasan_df = pd.DataFrame({
+        summary_view = pd.DataFrame({
 
             "Kategori": [
 
@@ -336,11 +377,29 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
         st.dataframe(
 
-            ringkasan_df,
+            summary_view,
 
             hide_index=True,
 
             use_container_width=True
+
+        )
+
+        st.markdown("---")
+
+        st.markdown("### ℹ️ Informasi")
+
+        st.info(
+
+            """
+Grafik menunjukkan distribusi jumlah transaksi
+pada masing-masing cluster hasil
+K-Means Clustering.
+
+Semakin tinggi batang grafik,
+semakin banyak transaksi yang
+termasuk pada kelompok tersebut.
+            """
 
         )
 
@@ -349,15 +408,20 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
     # DETAIL CENTROID
     # ======================================================
 
-    st.subheader("📐 Detail Hasil Perhitungan")
+    st.subheader("📐 Detail Nilai Centroid")
 
     with st.expander("Lihat Nilai Centroid"):
 
-        st.markdown("""
-Nilai centroid merupakan titik pusat masing-masing cluster yang
-dihasilkan oleh algoritma K-Means. Informasi ini digunakan sebagai
-acuan dalam proses pengelompokan transaksi.
-        """)
+        st.markdown(
+            """
+Nilai centroid merupakan titik pusat setiap cluster hasil
+K-Means Clustering.
+
+Semakin besar nilai centroid pada suatu variabel,
+maka semakin besar karakteristik variabel tersebut
+pada cluster yang bersangkutan.
+            """
+        )
 
         st.dataframe(
 
@@ -378,133 +442,166 @@ acuan dalam proses pengelompokan transaksi.
     st.subheader("🎯 Interpretasi Hasil Clustering")
 
     left, right = st.columns(2)
-        # ======================================================
-    # CARD PRIORITAS TINGGI
-    # ======================================================
+        with left:
 
-    with left:
+        with st.container(border=True):
 
-        st.markdown(
-            """
-            <div class="cluster-box cluster-high">
-            <div class="cluster-title">
-            🟧 Transaksi Prioritas Tinggi
-            </div>
+            st.markdown(
+                """
+### 🟧 Transaksi Prioritas Tinggi
 
-            <div class="cluster-desc">
-            Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
-            variasi menu, dan waktu pelayanan yang relatif lebih tinggi.
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+Kelompok transaksi yang memiliki karakteristik
+nilai transaksi, jumlah pesanan,
+dan waktu pelayanan yang relatif lebih tinggi.
+                """
+            )
 
-        # -----------------------------
-        # KPI
-        # -----------------------------
+            col1, col2 = st.columns(2)
 
-        col_a, col_b = st.columns(2)
+            with col1:
 
-        with col_a:
+                st.metric(
 
-            st.markdown(f"""
-            <div class="mini-card">
-                <div class="mini-number">{tinggi}</div>
-                <div class="mini-title">Jumlah Transaksi</div>
-            </div>
-            """,
-            unsafe_allow_html=True)
+                    "Jumlah",
 
-        with col_b:
+                    tinggi
 
-            st.markdown(f"""
-            <div class="mini-card">
-                <div class="mini-number">{tinggi_pct:.2f}%</div>
-                <div class="mini-title">Persentase</div>
-            </div>
-            """,
-            unsafe_allow_html=True)
+                )
 
-        st.markdown("### 📌 Karakteristik")
+            with col2:
 
-        st.markdown("""
-- ✅ Nilai transaksi relatif lebih tinggi.
-- ✅ Jumlah pesanan lebih banyak.
-- ✅ Variasi menu lebih beragam.
-- ✅ Waktu persiapan lebih lama.
-- ✅ Memerlukan perhatian lebih ketika jam operasional ramai.
-        """)
+                st.metric(
 
-        st.markdown("### 💡 Rekomendasi")
+                    "Persentase",
 
-        st.success("""
-1. Prioritaskan transaksi pada kelompok ini ketika antrean meningkat.
+                    f"{tinggi_pct:.2f}%"
 
-2. Pastikan stok bahan baku selalu tersedia.
+                )
 
-3. Lakukan persiapan bahan sebelum jam sibuk.
+            st.markdown("---")
 
-4. Tambahkan tenaga kerja ketika volume transaksi meningkat.
+            st.markdown("#### 📌 Karakteristik")
 
-5. Pantau waktu penyelesaian agar sesuai estimasi Shopee Food.
-        """)
+            st.markdown("""
 
-        st.markdown("</div>", unsafe_allow_html=True)
-            # ======================================================
+- Nilai transaksi relatif tinggi
+
+- Jumlah pesanan lebih banyak
+
+- Variasi menu lebih beragam
+
+- Waktu persiapan relatif lebih lama
+
+- Menjadi prioritas ketika jam operasional ramai
+
+""")
+
+            st.markdown("#### 💡 Rekomendasi")
+
+            st.markdown("""
+
+- Prioritaskan transaksi pada kelompok ini.
+
+- Pastikan stok bahan baku tersedia.
+
+- Siapkan bahan sebelum jam ramai.
+
+- Tambahkan tenaga kerja ketika volume meningkat.
+
+- Pantau waktu penyelesaian pesanan.
+
+""")
+                # ======================================================
     # CARD PRIORITAS NORMAL
     # ======================================================
 
     with right:
 
-    st.markdown("""
-<div class="cluster-header-normal">
-    <h3>🟩 Transaksi Prioritas Normal</h3>
-    <p>
-    Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
-    variasi menu, dan waktu pelayanan yang relatif lebih rendah.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+        with st.container(border=True):
 
-    col_a, col_b = st.columns(2)
+            st.markdown(
+                """
+### 🟩 Transaksi Prioritas Normal
 
-    with col_a:
-        st.metric(
-            "Jumlah Transaksi",
-            normal
-        )
+Kelompok transaksi yang memiliki karakteristik
+nilai transaksi, jumlah pesanan,
+dan waktu pelayanan yang relatif lebih rendah.
+                """
+            )
 
-    with col_b:
-        st.metric(
-            "Persentase",
-            f"{normal_pct:.2f}%"
-        )
+            col1, col2 = st.columns(2)
 
-    st.markdown("### 📌 Karakteristik")
+            with col1:
 
-    st.markdown("""
-- ✅ Nilai transaksi relatif lebih rendah.
-- ✅ Jumlah pesanan lebih sedikit.
-- ✅ Variasi menu lebih sederhana.
-- ✅ Waktu persiapan relatif lebih singkat.
-- ✅ Dapat diproses menggunakan SOP standar.
+                st.metric(
+
+                    "Jumlah",
+
+                    normal
+
+                )
+
+            with col2:
+
+                st.metric(
+
+                    "Persentase",
+
+                    f"{normal_pct:.2f}%"
+
+                )
+
+            st.markdown("---")
+
+            st.markdown("#### 📌 Karakteristik")
+
+            st.markdown("""
+
+- Nilai transaksi relatif lebih rendah
+
+- Jumlah pesanan lebih sedikit
+
+- Variasi menu lebih sederhana
+
+- Waktu persiapan relatif lebih singkat
+
+- Diproses menggunakan alur operasional standar
+
 """)
 
-    st.markdown("### 💡 Rekomendasi")
+            st.markdown("#### 💡 Rekomendasi")
 
-    st.success("""
-• Pertahankan kualitas pelayanan.
+            st.markdown("""
 
-• Gunakan SOP yang telah berjalan.
+- Pertahankan kualitas pelayanan.
 
-• Siapkan bahan baku saat waktu senggang.
+- Gunakan SOP yang telah berjalan.
 
-• Tingkatkan nilai transaksi melalui promosi.
+- Siapkan bahan baku sebelum jam operasional.
 
-• Evaluasi menu yang kurang diminati.
+- Tingkatkan nilai transaksi melalui promosi.
+
+- Evaluasi menu yang kurang diminati pelanggan.
+
 """)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.divider()
+
+    # ======================================================
+    # PROFIL CLUSTER
+    # ======================================================
+
+    st.subheader("📊 Profil Rata-rata Setiap Cluster")
+
+    profile_df = cluster_profile(result_df)
+
+    st.dataframe(
+
+        profile_df,
+
+        use_container_width=True
+
+    )
 
     st.divider()
 
@@ -514,11 +611,11 @@ acuan dalam proses pengelompokan transaksi.
 
     st.success(
         """
-Analisis clustering telah selesai dilakukan.
+Proses clustering berhasil dilakukan.
 
-Hasil pengelompokan ini dapat digunakan sebagai dasar dalam
-menentukan prioritas pelayanan transaksi Shopee Food pada
-Buffet The Padang Pasir.
+Hasil pengelompokan ini dapat digunakan sebagai
+acuan dalam memahami pola transaksi pelanggan
+serta membantu pengambilan keputusan operasional
+pada Buffet The Padang Pasir.
         """
     )
-    
