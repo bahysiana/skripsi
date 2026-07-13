@@ -24,7 +24,7 @@ def show_clustering():
     st.caption(
         """
 Analisis pola transaksi Shopee Food menggunakan
-algoritma K-Means Clustering.
+metode K-Means Clustering.
         """
     )
 
@@ -55,8 +55,9 @@ proses clustering.
     st.info(
         """
 Klik tombol **Jalankan Clustering**
-untuk mengelompokkan transaksi menjadi
-dua kelompok berdasarkan karakteristik transaksi.
+untuk melakukan proses pengelompokan
+data transaksi menggunakan metode
+K-Means Clustering.
         """
     )
 
@@ -64,9 +65,9 @@ dua kelompok berdasarkan karakteristik transaksi.
     # BUTTON
     # ======================================================
 
-    col1, col2 = st.columns([1, 5])
+    col_btn, col_info = st.columns([1, 5])
 
-    with col1:
+    with col_btn:
 
         mulai = st.button(
 
@@ -78,7 +79,7 @@ dua kelompok berdasarkan karakteristik transaksi.
 
         )
 
-    with col2:
+    with col_info:
 
         st.empty()
 
@@ -87,7 +88,7 @@ dua kelompok berdasarkan karakteristik transaksi.
         return
 
     # ======================================================
-    # PROSES KMEANS
+    # PROSES CLUSTERING
     # ======================================================
 
     with st.spinner("Sedang melakukan proses clustering..."):
@@ -105,7 +106,7 @@ dua kelompok berdasarkan karakteristik transaksi.
     )
 
     # ======================================================
-    # SIMPAN SESSION
+    # SESSION
     # ======================================================
 
     st.session_state["cluster_df"] = result_df
@@ -129,90 +130,58 @@ dua kelompok berdasarkan karakteristik transaksi.
     normal_pct = float(summary.iloc[1]["Persentase"])
 
     st.divider()
-        # ======================================================
-    # DASHBOARD KPI
+
+    # ======================================================
+    # KPI
     # ======================================================
 
     st.subheader("📌 Ringkasan Hasil Clustering")
 
-    st.markdown(
-        f"""
-        <div class="dashboard-row">
+    k1, k2, k3, k4 = st.columns(4)
 
-            <div class="dashboard-card">
+    with k1:
 
-                <div class="dashboard-icon">📦</div>
+        st.metric(
 
-                <div class="dashboard-value">
-                    {total_data}
-                </div>
+            "📦 Total Transaksi",
 
-                <div class="dashboard-label">
-                    Total Transaksi
-                </div>
+            total_data
 
-            </div>
+        )
 
-            <div class="dashboard-card">
+    with k2:
 
-                <div class="dashboard-icon orange">
-                    🟧
-                </div>
+        st.metric(
 
-                <div class="dashboard-value">
-                    {tinggi}
-                </div>
+            "🟧 Prioritas Tinggi",
 
-                <div class="dashboard-label">
-                    Prioritas Tinggi
-                </div>
+            tinggi,
 
-                <div class="dashboard-percent">
-                    {tinggi_pct:.2f}%
-                </div>
+            f"{tinggi_pct:.2f}%"
 
-            </div>
+        )
 
-            <div class="dashboard-card">
+    with k3:
 
-                <div class="dashboard-icon green">
-                    🟩
-                </div>
+        st.metric(
 
-                <div class="dashboard-value">
-                    {normal}
-                </div>
+            "🟩 Prioritas Normal",
 
-                <div class="dashboard-label">
-                    Prioritas Normal
-                </div>
+            normal,
 
-                <div class="dashboard-percent">
-                    {normal_pct:.2f}%
-                </div>
+            f"{normal_pct:.2f}%"
 
-            </div>
+        )
 
-            <div class="dashboard-card">
+    with k4:
 
-                <div class="dashboard-icon">
-                    🧠
-                </div>
+        st.metric(
 
-                <div class="dashboard-value">
-                    2
-                </div>
+            "🧠 Jumlah Cluster",
 
-                <div class="dashboard-label">
-                    Jumlah Cluster
-                </div>
+            "2"
 
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        )
 
     st.divider()
 
@@ -224,25 +193,24 @@ dua kelompok berdasarkan karakteristik transaksi.
 
     st.markdown(
         f"""
-Berdasarkan hasil proses **K-Means Clustering**, sebanyak
-**{total_data} transaksi** berhasil dikelompokkan menjadi
-**2 kelompok transaksi**.
+Berdasarkan proses **K-Means Clustering** terhadap
+**{total_data} transaksi**, diperoleh:
 
-- 🟧 **Transaksi Prioritas Tinggi** berjumlah **{tinggi} transaksi**
-  atau sekitar **{tinggi_pct:.2f}%** dari seluruh data.
+- **{tinggi} transaksi ({tinggi_pct:.2f}%)**
+  termasuk kelompok **Transaksi Prioritas Tinggi**.
 
-- 🟩 **Transaksi Prioritas Normal** berjumlah **{normal} transaksi**
-  atau sekitar **{normal_pct:.2f}%** dari seluruh data.
+- **{normal} transaksi ({normal_pct:.2f}%)**
+  termasuk kelompok **Transaksi Prioritas Normal**.
 
-Informasi ini memberikan gambaran mengenai pola transaksi
-yang dapat digunakan sebagai dasar dalam menentukan prioritas
-pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
+Pengelompokan ini memberikan gambaran pola transaksi
+yang dapat digunakan sebagai dasar dalam mendukung
+pengambilan keputusan operasional pada Buffet The Padang Pasir.
         """
     )
 
     st.divider()
         # ======================================================
-    # VISUALISASI CLUSTER
+    # VISUALISASI HASIL CLUSTERING
     # ======================================================
 
     st.subheader("📈 Visualisasi Hasil Clustering")
@@ -250,7 +218,7 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
     col_chart, col_table = st.columns([2, 1])
 
     # ======================================================
-    # GRAFIK BAR
+    # GRAFIK DISTRIBUSI
     # ======================================================
 
     with col_chart:
@@ -287,13 +255,11 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
             color="Kategori",
 
-            color="Kategori",
-
             color_discrete_map={
 
                 "Prioritas Tinggi": "#F57C00",
 
-                "Prioritas Normal": "#43A047"
+                "Prioritas Normal": "#34A853"
 
             }
 
@@ -303,11 +269,11 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
             height=430,
 
+            showlegend=False,
+
             plot_bgcolor="white",
 
             paper_bgcolor="white",
-
-            showlegend=False,
 
             margin=dict(
 
@@ -315,7 +281,7 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
                 r=20,
 
-                t=30,
+                t=20,
 
                 b=20
 
@@ -325,9 +291,7 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
         fig.update_traces(
 
-            textposition="outside",
-
-            marker_line_width=0
+            textposition="outside"
 
         )
 
@@ -340,14 +304,14 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
         )
 
     # ======================================================
-    # TABEL RINGKASAN
+    # RINGKASAN
     # ======================================================
 
     with col_table:
 
-        st.markdown("### 📋 Ringkasan")
+        st.subheader("📋 Ringkasan")
 
-        summary_view = pd.DataFrame({
+        ringkasan_df = pd.DataFrame({
 
             "Kategori": [
 
@@ -377,7 +341,7 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
         st.dataframe(
 
-            summary_view,
+            ringkasan_df,
 
             hide_index=True,
 
@@ -385,27 +349,26 @@ pelayanan dan pengelolaan operasional pada Buffet The Padang Pasir.
 
         )
 
-        st.markdown("---")
-
         st.markdown("### ℹ️ Informasi")
 
         st.info(
 
             """
-Grafik menunjukkan distribusi jumlah transaksi
+Grafik menunjukkan jumlah transaksi
 pada masing-masing cluster hasil
 K-Means Clustering.
 
 Semakin tinggi batang grafik,
-semakin banyak transaksi yang
-termasuk pada kelompok tersebut.
+semakin banyak transaksi
+yang termasuk dalam cluster tersebut.
             """
 
         )
 
     st.divider()
-        # ======================================================
-    # DETAIL CENTROID
+
+    # ======================================================
+    # DETAIL NILAI CENTROID
     # ======================================================
 
     st.subheader("📐 Detail Nilai Centroid")
@@ -414,12 +377,11 @@ termasuk pada kelompok tersebut.
 
         st.markdown(
             """
-Nilai centroid merupakan titik pusat setiap cluster hasil
-K-Means Clustering.
+Centroid merupakan titik pusat dari setiap cluster
+yang dihasilkan oleh algoritma K-Means.
 
-Semakin besar nilai centroid pada suatu variabel,
-maka semakin besar karakteristik variabel tersebut
-pada cluster yang bersangkutan.
+Nilai centroid digunakan sebagai acuan
+dalam menentukan karakteristik masing-masing cluster.
             """
         )
 
@@ -442,180 +404,3 @@ pada cluster yang bersangkutan.
     st.subheader("🎯 Interpretasi Hasil Clustering")
 
     left, right = st.columns(2)
-        with left:
-
-        with st.container(border=True):
-
-            st.markdown(
-                """
-### 🟧 Transaksi Prioritas Tinggi
-
-Kelompok transaksi yang memiliki karakteristik
-nilai transaksi, jumlah pesanan,
-dan waktu pelayanan yang relatif lebih tinggi.
-                """
-            )
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-
-                st.metric(
-
-                    "Jumlah",
-
-                    tinggi
-
-                )
-
-            with col2:
-
-                st.metric(
-
-                    "Persentase",
-
-                    f"{tinggi_pct:.2f}%"
-
-                )
-
-            st.markdown("---")
-
-            st.markdown("#### 📌 Karakteristik")
-
-            st.markdown("""
-
-- Nilai transaksi relatif tinggi
-
-- Jumlah pesanan lebih banyak
-
-- Variasi menu lebih beragam
-
-- Waktu persiapan relatif lebih lama
-
-- Menjadi prioritas ketika jam operasional ramai
-
-""")
-
-            st.markdown("#### 💡 Rekomendasi")
-
-            st.markdown("""
-
-- Prioritaskan transaksi pada kelompok ini.
-
-- Pastikan stok bahan baku tersedia.
-
-- Siapkan bahan sebelum jam ramai.
-
-- Tambahkan tenaga kerja ketika volume meningkat.
-
-- Pantau waktu penyelesaian pesanan.
-
-""")
-                # ======================================================
-    # CARD PRIORITAS NORMAL
-    # ======================================================
-
-    with right:
-
-        with st.container(border=True):
-
-            st.markdown(
-                """
-### 🟩 Transaksi Prioritas Normal
-
-Kelompok transaksi yang memiliki karakteristik
-nilai transaksi, jumlah pesanan,
-dan waktu pelayanan yang relatif lebih rendah.
-                """
-            )
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-
-                st.metric(
-
-                    "Jumlah",
-
-                    normal
-
-                )
-
-            with col2:
-
-                st.metric(
-
-                    "Persentase",
-
-                    f"{normal_pct:.2f}%"
-
-                )
-
-            st.markdown("---")
-
-            st.markdown("#### 📌 Karakteristik")
-
-            st.markdown("""
-
-- Nilai transaksi relatif lebih rendah
-
-- Jumlah pesanan lebih sedikit
-
-- Variasi menu lebih sederhana
-
-- Waktu persiapan relatif lebih singkat
-
-- Diproses menggunakan alur operasional standar
-
-""")
-
-            st.markdown("#### 💡 Rekomendasi")
-
-            st.markdown("""
-
-- Pertahankan kualitas pelayanan.
-
-- Gunakan SOP yang telah berjalan.
-
-- Siapkan bahan baku sebelum jam operasional.
-
-- Tingkatkan nilai transaksi melalui promosi.
-
-- Evaluasi menu yang kurang diminati pelanggan.
-
-""")
-
-    st.divider()
-
-    # ======================================================
-    # PROFIL CLUSTER
-    # ======================================================
-
-    st.subheader("📊 Profil Rata-rata Setiap Cluster")
-
-    profile_df = cluster_profile(result_df)
-
-    st.dataframe(
-
-        profile_df,
-
-        use_container_width=True
-
-    )
-
-    st.divider()
-
-    # ======================================================
-    # FOOTER
-    # ======================================================
-
-    st.success(
-        """
-Proses clustering berhasil dilakukan.
-
-Hasil pengelompokan ini dapat digunakan sebagai
-acuan dalam memahami pola transaksi pelanggan
-serta membantu pengambilan keputusan operasional
-pada Buffet The Padang Pasir.
-        """
-    )
