@@ -153,7 +153,7 @@ K-Means Clustering.
 
         st.metric(
 
-            "🟧 Prioritas Tinggi",
+            "🟧 Beban Pelayanan Tinggi",
 
             tinggi,
 
@@ -165,7 +165,7 @@ K-Means Clustering.
 
         st.metric(
 
-            "🟩 Prioritas Normal",
+            "🟩 Beban Pelayanan Rendah",
 
             normal,
 
