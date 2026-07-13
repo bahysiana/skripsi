@@ -1,5 +1,5 @@
+import re
 import pandas as pd
-
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -14,13 +14,13 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    # Hilangkan spasi pada nama kolom
+    # Menghapus spasi pada nama kolom
     df.columns = df.columns.str.strip()
 
-    # Hapus data duplikat
+    # Menghapus data duplikat
     df = df.drop_duplicates()
 
-    # Hapus data kosong
+    # Menghapus data kosong
     df = df.dropna()
 
     return df
@@ -32,12 +32,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def count_menu_types(menu) -> int:
     """
-    Menghitung jumlah jenis menu
-    berdasarkan menu_yang_dibeli.
+    Menghitung jumlah jenis menu yang dibeli.
     """
 
     if pd.isna(menu):
-
         return 0
 
     menu_list = [
@@ -54,18 +52,53 @@ def count_menu_types(menu) -> int:
 
 
 # ==========================================================
+# KONVERSI WAKTU
+# ==========================================================
+
+def convert_minutes(value):
+    """
+    Mengubah teks:
+    '13 menit' -> 13
+    """
+
+    if pd.isna(value):
+        return None
+
+    angka = re.findall(r"\d+", str(value))
+
+    if len(angka) == 0:
+        return None
+
+    return int(angka[0])
+
+
+# ==========================================================
 # FEATURE ENGINEERING
 # ==========================================================
 
-def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+def feature_engineering(df: pd.DataFrame):
     """
-    Menambahkan variabel Jumlah_jenis_menu.
+    Feature engineering.
     """
 
     df = df.copy()
 
+    # Jumlah jenis menu
+
     df["Jumlah_jenis_menu"] = df["menu_yang_dibeli"].apply(
         count_menu_types
+    )
+
+    # Konversi waktu persiapan
+
+    df["waktu_persiapan_yang_diberikan"] = (
+        df["waktu_persiapan_yang_diberikan"]
+        .apply(convert_minutes)
+    )
+
+    df["waktu_persiapan_digunakan"] = (
+        df["waktu_persiapan_digunakan"]
+        .apply(convert_minutes)
     )
 
     return df
@@ -94,14 +127,9 @@ FEATURE_COLUMNS = [
 # SELECT FEATURE
 # ==========================================================
 
-def select_features(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Mengambil variabel penelitian.
-    """
+def select_features(df: pd.DataFrame):
 
-    # Pastikan semua kolom tersedia
-
-    kolom_tidak_ada = [
+    kolom_hilang = [
 
         col
 
@@ -111,13 +139,13 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
 
     ]
 
-    if len(kolom_tidak_ada) > 0:
+    if kolom_hilang:
 
         raise ValueError(
 
-            "Kolom berikut tidak ditemukan pada dataset:\n\n"
+            "Kolom berikut tidak ditemukan:\n\n"
 
-            + "\n".join(kolom_tidak_ada)
+            + "\n".join(kolom_hilang)
 
         )
 
@@ -130,14 +158,11 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
 # MIN MAX NORMALIZATION
 # ==========================================================
 
-def minmax_normalization(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Melakukan normalisasi Min-Max.
-    """
+def minmax_normalization(df: pd.DataFrame):
 
     numeric_df = df.copy()
 
-    # Pastikan seluruh data numerik
+    # Pastikan seluruh kolom numerik
 
     for col in numeric_df.columns:
 
@@ -149,16 +174,18 @@ def minmax_normalization(df: pd.DataFrame) -> pd.DataFrame:
 
         )
 
-    # Hapus data yang masih tidak valid
+    # Cek apakah ada nilai kosong
 
-    numeric_df = numeric_df.dropna()
+    if numeric_df.isnull().sum().sum() > 0:
+
+        raise ValueError(
+            "Masih terdapat data yang bukan numerik pada variabel penelitian."
+        )
 
     scaler = MinMaxScaler()
 
     normalized = scaler.fit_transform(
-
         numeric_df
-
     )
 
     normalized_df = pd.DataFrame(
@@ -182,48 +209,32 @@ def preprocess_dataset(df: pd.DataFrame):
     """
     Pipeline preprocessing.
 
-    Tahapan:
-
-    1. Cleaning
+    1. Data Cleaning
     2. Feature Engineering
     3. Select Feature
     4. Min-Max Normalization
     """
 
-    # -------------------------
     # Cleaning
-    # -------------------------
 
     cleaned_df = clean_data(df)
 
-    # -------------------------
     # Feature Engineering
-    # -------------------------
 
     engineered_df = feature_engineering(
-
         cleaned_df
-
     )
 
-    # -------------------------
     # Variabel Penelitian
-    # -------------------------
 
     feature_df = select_features(
-
         engineered_df
-
     )
 
-    # -------------------------
-    # Min-Max Normalization
-    # -------------------------
+    # Normalisasi
 
     normalized_df = minmax_normalization(
-
         feature_df
-
     )
 
     return (
