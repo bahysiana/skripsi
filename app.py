@@ -18,6 +18,7 @@ from views.download import show_download
 st.set_page_config(
     page_title="Analisis Pola Transaksi Shopee Food",
     layout="wide",
+    page_icon="🍽️",
     initial_sidebar_state="expanded"
 )
 
@@ -46,8 +47,6 @@ except FileNotFoundError:
 # =====================================================
 
 with st.sidebar:
-
-    st.markdown("# 🍽️")
 
     st.markdown(
         """
