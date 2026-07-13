@@ -4,10 +4,10 @@ from sklearn.cluster import KMeans
 
 
 # ==========================================================
-# KONSTANTA
+# DEFAULT
 # ==========================================================
 
-N_CLUSTER = 2
+DEFAULT_CLUSTER = 2
 
 RANDOM_STATE = 42
 
@@ -16,14 +16,33 @@ RANDOM_STATE = 42
 # PROSES K-MEANS
 # ==========================================================
 
-def run_kmeans(df: pd.DataFrame):
+def perform_clustering(
+    df: pd.DataFrame,
+    n_clusters: int = DEFAULT_CLUSTER
+):
     """
-    Menjalankan proses K-Means Clustering.
+    Melakukan proses K-Means Clustering.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Dataset hasil preprocessing.
+
+    n_clusters : int
+        Jumlah cluster.
+
+    Returns
+    -------
+    result_df : DataFrame
+        Dataset beserta label cluster.
+
+    centroid_df : DataFrame
+        Nilai centroid.
     """
 
     model = KMeans(
 
-        n_clusters=N_CLUSTER,
+        n_clusters=n_clusters,
 
         random_state=RANDOM_STATE,
 
@@ -31,13 +50,13 @@ def run_kmeans(df: pd.DataFrame):
 
     )
 
-    cluster = model.fit_predict(df)
+    labels = model.fit_predict(df)
 
-    result = df.copy()
+    result_df = df.copy()
 
-    result["Cluster"] = cluster
+    result_df["Cluster"] = labels
 
-    centroid = pd.DataFrame(
+    centroid_df = pd.DataFrame(
 
         model.cluster_centers_,
 
@@ -45,21 +64,23 @@ def run_kmeans(df: pd.DataFrame):
 
     )
 
-    return result, centroid, model
+    return result_df, centroid_df
 
 
 # ==========================================================
 # RINGKASAN CLUSTER
 # ==========================================================
 
-def cluster_summary(df: pd.DataFrame):
+def cluster_summary(
+    cluster_df: pd.DataFrame
+):
     """
-    Menghitung jumlah anggota setiap cluster.
+    Menghasilkan ringkasan jumlah anggota cluster.
     """
 
     summary = (
 
-        df["Cluster"]
+        cluster_df["Cluster"]
 
         .value_counts()
 
@@ -73,15 +94,15 @@ def cluster_summary(df: pd.DataFrame):
 
         "Cluster",
 
-        "Jumlah_Data"
+        "Jumlah"
 
     ]
 
     summary["Persentase"] = (
 
-        summary["Jumlah_Data"]
+        summary["Jumlah"]
 
-        / summary["Jumlah_Data"].sum()
+        / summary["Jumlah"].sum()
 
         * 100
 
@@ -91,18 +112,20 @@ def cluster_summary(df: pd.DataFrame):
 
 
 # ==========================================================
-# RATA-RATA SETIAP CLUSTER
+# PROFIL CLUSTER
 # ==========================================================
 
-def cluster_profile(df: pd.DataFrame):
+def cluster_profile(
+    cluster_df: pd.DataFrame
+):
     """
-    Menghitung rata-rata setiap variabel
-    berdasarkan cluster.
+    Menghasilkan rata-rata setiap variabel
+    pada masing-masing cluster.
     """
 
     profile = (
 
-        df
+        cluster_df
 
         .groupby("Cluster")
 
@@ -113,3 +136,20 @@ def cluster_profile(df: pd.DataFrame):
     )
 
     return profile
+
+
+# ==========================================================
+# NAMA CLUSTER
+# ==========================================================
+
+def cluster_name(cluster: int):
+    """
+    Mengubah nomor cluster menjadi
+    nama yang mudah dipahami.
+    """
+
+    if cluster == 0:
+
+        return "Transaksi Prioritas Tinggi"
+
+    return "Transaksi Prioritas Normal"
