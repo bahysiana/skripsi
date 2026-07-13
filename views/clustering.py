@@ -227,9 +227,9 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
             "Kategori": [
 
-                "Prioritas Tinggi",
+                "Beban Pelayanan Tinggi",
 
-                "Prioritas Normal"
+                "Beban Pelayanan Rendah"
 
             ],
 
