@@ -197,10 +197,10 @@ Berdasarkan proses **K-Means Clustering** terhadap
 **{total_data} transaksi**, diperoleh:
 
 - **{tinggi} transaksi ({tinggi_pct:.2f}%)**
-  termasuk kelompok **Transaksi Prioritas Tinggi**.
+  termasuk kelompok **Beban Pelayanan Tinggi**.
 
 - **{normal} transaksi ({normal_pct:.2f}%)**
-  termasuk kelompok **Transaksi Prioritas Normal**.
+  termasuk kelompok **Beban Pelayanan Rendah**.
 
 Pengelompokan ini memberikan gambaran pola transaksi
 yang dapat digunakan sebagai dasar dalam mendukung
@@ -257,9 +257,9 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
             color_discrete_map={
 
-                "Prioritas Tinggi": "#F57C00",
+                "Beban Pelayanan Tinggi": "#F57C00",
 
-                "Prioritas Normal": "#34A853"
+                "Beban Pelayanan Rendah": "#34A853"
 
             }
 
@@ -315,9 +315,9 @@ pengambilan keputusan operasional pada Buffet The Padang Pasir.
 
             "Kategori": [
 
-                "Prioritas Tinggi",
+                "Beban Pelayanan Tinggi",
 
-                "Prioritas Normal"
+                "PBeban Pelayanan Rendah"
 
             ],
 
