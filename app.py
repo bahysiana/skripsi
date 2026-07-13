@@ -52,7 +52,7 @@ with st.sidebar:
         """
 ### Buffet The Padang Pasir
 
-Analisis Pola Transaksi Shopee Food
+🍽️Analisis Pola Transaksi Shopee Food🍽️
         """
     )
 
