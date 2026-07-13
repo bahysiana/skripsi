@@ -17,7 +17,6 @@ from views.download import show_download
 
 st.set_page_config(
     page_title="Analisis Pola Transaksi Shopee Food",
-    page_icon="🍽️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
