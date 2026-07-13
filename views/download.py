@@ -80,6 +80,19 @@ Silakan lakukan proses clustering terlebih dahulu.
     # INFORMASI
     # ======================================================
 
+    st.info(
+        """
+Seluruh hasil analisis dapat diunduh
+sesuai kebutuhan.
+
+• PDF digunakan sebagai laporan hasil analisis.
+
+• Excel digunakan untuk pengolahan data lanjutan.
+
+• CSV digunakan untuk pertukaran data dengan aplikasi lain.
+        """
+    )
+
     st.divider()
 
     # ======================================================
