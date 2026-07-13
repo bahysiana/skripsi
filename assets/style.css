@@ -1310,3 +1310,182 @@ header{
     background:transparent;
 
 }
+/* ==========================================================
+   CLUSTER CARD
+========================================================== */
+
+.cluster-card {
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+
+    transition: .3s;
+
+}
+
+.cluster-card:hover{
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 15px 35px rgba(0,0,0,.12);
+
+}
+
+/* ==========================================================
+   PRIORITAS TINGGI
+========================================================== */
+
+.high-priority{
+
+    border-left:8px solid #ff7a00;
+
+    background:#fff8f2;
+
+}
+
+/* ==========================================================
+   PRIORITAS NORMAL
+========================================================== */
+
+.normal-priority{
+
+    border-left:8px solid #2e7d32;
+
+    background:#f4fff5;
+
+}
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.cluster-title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+}
+
+.cluster-subtitle{
+
+    color:#666;
+
+    margin-bottom:25px;
+
+    font-size:15px;
+
+}
+
+/* ==========================================================
+   INFO BOX
+========================================================== */
+
+.info-box{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin:10px 0;
+
+    border:1px solid #ececec;
+
+}
+
+/* ==========================================================
+   CHECKLIST
+========================================================== */
+
+.check-item{
+
+    margin-bottom:8px;
+
+    font-size:15px;
+
+}
+
+/* ==========================================================
+   REKOMENDASI
+========================================================== */
+
+.rekomendasi{
+
+    background:#f8f9fa;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    margin-top:15px;
+
+    border:1px solid #ececec;
+
+}
+
+/* ==========================================================
+   KPI CARD
+========================================================== */
+
+.kpi-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    box-shadow:0 6px 15px rgba(0,0,0,.08);
+
+    text-align:center;
+
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+[data-testid="stDataFrame"]{
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+}
+
+/* ==========================================================
+   PLOTLY
+========================================================== */
+
+.js-plotly-plot{
+
+    border-radius:18px;
+
+    background:white;
+
+    padding:10px;
+
+}
+
+/* ==========================================================
+   EXPANDER
+========================================================== */
+
+.streamlit-expanderHeader{
+
+    font-size:17px;
+
+    font-weight:600;
+
+}
