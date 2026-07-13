@@ -150,6 +150,6 @@ def cluster_name(cluster: int):
 
     if cluster == 0:
 
-        return "Transaksi Prioritas Tinggi"
+        return "Pola Transaksi dengan Beban Pelayanan Tinggi"
 
-    return "Transaksi Prioritas Normal"
+    return "Pola Transaksi dengan Beban Pelayanan Rendah"
