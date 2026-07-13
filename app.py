@@ -62,7 +62,7 @@ Analisis Pola Transaksi Shopee Food
 
     selected = option_menu(
 
-        menu_title="Menu",
+        menu_title="None",
 
         options=[
             "Home",
