@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 from utils.database import (
     get_all_data,
@@ -27,7 +26,7 @@ def show_preprocessing():
     st.divider()
 
     # ======================================================
-    # DATABASE CHECK
+    # CEK DATABASE
     # ======================================================
 
     if is_database_empty():
@@ -36,8 +35,7 @@ def show_preprocessing():
             """
 Belum ada dataset pada database.
 
-Silakan upload dataset terlebih dahulu
-melalui menu **Kelola Data**.
+Silakan upload dataset terlebih dahulu melalui menu **Kelola Data**.
             """
         )
 
@@ -48,6 +46,28 @@ melalui menu **Kelola Data**.
     # ======================================================
 
     df = get_all_data()
+
+    # ======================================================
+    # DEBUG DATASET
+    # ======================================================
+
+    with st.expander("🔍 Debug Dataset"):
+
+        st.write("Nama Kolom")
+
+        st.write(df.columns.tolist())
+
+        st.write("Tipe Data")
+
+        st.write(df.dtypes)
+
+        st.write("5 Data Pertama")
+
+        st.dataframe(
+            df.head(),
+            use_container_width=True,
+            hide_index=True
+        )
 
     # ======================================================
     # INFORMASI
@@ -75,39 +95,53 @@ Tahapan preprocessing yang dilakukan:
 
     st.subheader("📂 Dataset Awal")
 
-    st.write(f"Jumlah Data : **{len(df)}**")
+    col1, col2 = st.columns(2)
 
-    st.write(f"Jumlah Kolom : **{len(df.columns)}**")
+    with col1:
+
+        st.metric(
+            "Jumlah Data",
+            len(df)
+        )
+
+    with col2:
+
+        st.metric(
+            "Jumlah Kolom",
+            len(df.columns)
+        )
 
     st.dataframe(
-
         df,
-
         use_container_width=True,
-
         hide_index=True
-
     )
 
     st.divider()
 
     # ======================================================
-    # PROSES
+    # BUTTON PREPROCESS
     # ======================================================
 
     if st.button(
-
         "▶ Mulai Preprocessing",
-
         type="primary",
-
         use_container_width=True
-
     ):
 
-        with st.spinner("Sedang melakukan preprocessing..."):
+        try:
 
-            original_df, feature_df, normalized_df = preprocess_dataset(df)
+            with st.spinner("Sedang melakukan preprocessing..."):
+
+                original_df, feature_df, normalized_df = preprocess_dataset(df)
+
+        except Exception as e:
+
+            st.error("Preprocessing gagal.")
+
+            st.code(str(e))
+
+            return
 
         st.success(
             "Preprocessing berhasil dilakukan."
@@ -116,23 +150,20 @@ Tahapan preprocessing yang dilakukan:
         st.divider()
 
         # ==================================================
-        # CLEANING
+        # HASIL CLEANING
         # ==================================================
 
         st.subheader("🧹 Hasil Data Cleaning")
 
-        st.write(f"Jumlah Data : **{len(original_df)}**")
-
-        st.write(f"Jumlah Kolom : **{len(original_df.columns)}**")
+        st.metric(
+            "Jumlah Data",
+            len(original_df)
+        )
 
         st.dataframe(
-
             original_df,
-
             use_container_width=True,
-
             hide_index=True
-
         )
 
         st.divider()
@@ -148,21 +179,13 @@ Tahapan preprocessing yang dilakukan:
 Kolom baru berhasil ditambahkan:
 
 • Jumlah_jenis_menu
-
-• Jumlah_Item_Makanan
-
-• Jumlah_Item_Minuman
             """
         )
 
         st.dataframe(
-
             original_df,
-
             use_container_width=True,
-
             hide_index=True
-
         )
 
         st.divider()
@@ -176,13 +199,9 @@ Kolom baru berhasil ditambahkan:
         st.write(FEATURE_COLUMNS)
 
         st.dataframe(
-
             feature_df,
-
             use_container_width=True,
-
             hide_index=True
-
         )
 
         st.divider()
@@ -194,19 +213,15 @@ Kolom baru berhasil ditambahkan:
         st.subheader("📈 Hasil Min-Max Normalization")
 
         st.dataframe(
-
             normalized_df,
-
             use_container_width=True,
-
             hide_index=True
-
         )
 
         st.divider()
 
         # ==================================================
-        # SESSION
+        # SIMPAN SESSION
         # ==================================================
 
         st.session_state["original_df"] = original_df
