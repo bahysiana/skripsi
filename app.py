@@ -50,9 +50,9 @@ with st.sidebar:
 
     st.markdown(
         """
-### Buffet The Padang Pasir
+### 🍽️Buffet The Padang Pasir🍽️
 
-🍽️Analisis Pola Transaksi Shopee Food🍽️
+Analisis Pola Transaksi Shopee Food
         """
     )
 
