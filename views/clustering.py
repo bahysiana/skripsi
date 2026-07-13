@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
 from utils.clustering import perform_clustering
 
@@ -11,13 +10,17 @@ from utils.clustering import perform_clustering
 
 def show_clustering():
 
+    # ======================================================
+    # HEADER
+    # ======================================================
+
     st.title("📊 Hasil Clustering")
 
     st.caption(
         """
 Analisis pola transaksi Shopee Food menggunakan
 metode K-Means Clustering dengan jumlah cluster (K = 2).
-"""
+        """
     )
 
     st.divider()
@@ -31,8 +34,8 @@ metode K-Means Clustering dengan jumlah cluster (K = 2).
         st.warning(
             """
 Silakan lakukan **Preprocessing**
-terlebih dahulu.
-"""
+terlebih dahulu melalui menu Preprocessing.
+            """
         )
 
         return
@@ -40,36 +43,40 @@ terlebih dahulu.
     normalized_df = st.session_state["normalized_df"]
 
     # ======================================================
+    # INFORMASI
+    # ======================================================
+
+    st.info(
+        """
+Klik tombol **Jalankan Clustering**
+untuk melakukan proses pengelompokan transaksi
+menggunakan algoritma K-Means.
+        """
+    )
+
+    # ======================================================
     # BUTTON
     # ======================================================
 
-    col1, col2 = st.columns([1,5])
+    if not st.button(
 
-    with col1:
+        "🚀 Jalankan Clustering",
 
-        mulai = st.button(
-            "🚀 Jalankan",
-            type="primary",
-            use_container_width=True
-        )
+        type="primary",
 
-    with col2:
+        use_container_width=True
 
-        st.info(
-            "Tekan tombol **Jalankan** untuk melakukan proses K-Means Clustering."
-        )
-
-    if not mulai:
+    ):
 
         return
 
     # ======================================================
-    # CLUSTERING
+    # PROSES CLUSTERING
     # ======================================================
 
-    with st.spinner("Melakukan proses clustering..."):
+    with st.spinner("Sedang melakukan clustering..."):
 
-        result_df, centroid_df = perform_clustering(
+        cluster_df, centroid_df = perform_clustering(
 
             normalized_df,
 
@@ -79,16 +86,21 @@ terlebih dahulu.
 
     st.success("Clustering berhasil dilakukan.")
 
-    st.session_state["cluster_df"] = result_df
+    # ======================================================
+    # SIMPAN SESSION
+    # ======================================================
+
+    st.session_state["cluster_df"] = cluster_df
+
     st.session_state["centroid_df"] = centroid_df
 
     # ======================================================
-    # RINGKASAN
+    # RINGKASAN CLUSTER
     # ======================================================
 
     summary = (
 
-        result_df["Cluster"]
+        cluster_df["Cluster"]
 
         .value_counts()
 
@@ -106,13 +118,13 @@ terlebih dahulu.
 
     ]
 
-    total = len(result_df)
+    total_data = len(cluster_df)
 
     summary["Persentase"] = (
 
         summary["Jumlah"]
 
-        / total
+        / total_data
 
         * 100
 
@@ -124,9 +136,9 @@ terlebih dahulu.
 
     summary["Kategori"] = [
 
-        "Prioritas Tinggi",
+        "Transaksi Prioritas Tinggi",
 
-        "Prioritas Normal"
+        "Transaksi Prioritas Normal"
 
     ]
 
@@ -139,91 +151,84 @@ terlebih dahulu.
     normal_pct = float(summary.iloc[1]["Persentase"])
 
     st.divider()
-
-    # ======================================================
-    # KPI
+        # ======================================================
+    # RINGKASAN ANALISIS
     # ======================================================
 
     st.subheader("📌 Ringkasan Hasil Analisis")
 
-    k1, k2, k3, k4 = st.columns(4)
-
-    with k1:
-
-        st.metric(
-
-            "📦 Total Transaksi",
-
-            total
-
-        )
-
-    with k2:
-
-        st.metric(
-
-            "🟧 Prioritas Tinggi",
-
-            tinggi,
-
-            f"{tinggi_pct}%"
-
-        )
-
-    with k3:
-
-        st.metric(
-
-            "🟩 Prioritas Normal",
-
-            normal,
-
-            f"{normal_pct}%"
-
-        )
-
-    with k4:
-
-        st.metric(
-
-            "🧠 Cluster",
-
-            "2"
-
-        )
-
-    st.divider()
-
-    # ======================================================
-    # INFORMASI
-    # ======================================================
-
     st.info(
         f"""
-Dari **{total} transaksi** yang dianalisis,
-sebanyak **{tinggi} transaksi ({tinggi_pct:.2f}%)**
-termasuk kelompok **Prioritas Tinggi**.
+Dari **{total_data} transaksi** yang dianalisis menggunakan metode
+**K-Means Clustering**, diperoleh:
 
-Sedangkan **{normal} transaksi ({normal_pct:.2f}%)**
-termasuk kelompok **Prioritas Normal**.
+- **{tinggi} transaksi ({tinggi_pct:.2f}%)** termasuk kategori **Transaksi Prioritas Tinggi**.
+- **{normal} transaksi ({normal_pct:.2f}%)** termasuk kategori **Transaksi Prioritas Normal**.
+
+Hasil ini dapat digunakan sebagai dasar dalam menentukan prioritas pelayanan
+dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
 """
     )
 
     st.divider()
 
     # ======================================================
+    # KPI CARD
+    # ======================================================
+
+    st.subheader("📊 Statistik Clustering")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+
+        st.metric(
+            label="📦 Total Transaksi",
+            value=total_data
+        )
+
+    with col2:
+
+        st.metric(
+            label="🟧 Prioritas Tinggi",
+            value=tinggi,
+            delta=f"{tinggi_pct:.2f}%"
+        )
+
+    with col3:
+
+        st.metric(
+            label="🟩 Prioritas Normal",
+            value=normal,
+            delta=f"{normal_pct:.2f}%"
+        )
+
+    with col4:
+
+        st.metric(
+            label="🧠 Jumlah Cluster",
+            value="2"
+        )
+
+    st.divider()
+
+    # ======================================================
+    # GRAFIK DAN TABEL
+    # ======================================================
+
+    left, right = st.columns([1.7, 1])
+
+    # ======================================================
     # GRAFIK
     # ======================================================
 
-    left, right = st.columns([1.6,1])
-
     with left:
 
-        st.subheader("📈 Distribusi Cluster")
+        st.subheader("📈 Distribusi Hasil Clustering")
 
-        chart = pd.DataFrame({
+        chart_df = pd.DataFrame({
 
-            "Kategori":[
+            "Kategori": [
 
                 "Prioritas Tinggi",
 
@@ -231,7 +236,7 @@ termasuk kelompok **Prioritas Normal**.
 
             ],
 
-            "Jumlah":[
+            "Jumlah": [
 
                 tinggi,
 
@@ -241,23 +246,25 @@ termasuk kelompok **Prioritas Normal**.
 
         })
 
+        import plotly.express as px
+
         fig = px.bar(
 
-            chart,
+            chart_df,
 
             x="Kategori",
 
             y="Jumlah",
 
-            color="Kategori",
-
             text="Jumlah",
+
+            color="Kategori",
 
             color_discrete_map={
 
-                "Prioritas Tinggi":"#ff7a00",
+                "Prioritas Tinggi": "#ff7a00",
 
-                "Prioritas Normal":"#34a853"
+                "Prioritas Normal": "#34a853"
 
             }
 
@@ -271,7 +278,9 @@ termasuk kelompok **Prioritas Normal**.
 
             plot_bgcolor="white",
 
-            paper_bgcolor="white"
+            paper_bgcolor="white",
+
+            title=None
 
         )
 
@@ -289,13 +298,17 @@ termasuk kelompok **Prioritas Normal**.
 
         )
 
+    # ======================================================
+    # RINGKASAN CLUSTER
+    # ======================================================
+
     with right:
 
         st.subheader("📋 Ringkasan Cluster")
 
-        ringkasan = pd.DataFrame({
+        ringkasan_df = pd.DataFrame({
 
-            "Kategori":[
+            "Kategori": [
 
                 "Prioritas Tinggi",
 
@@ -303,7 +316,7 @@ termasuk kelompok **Prioritas Normal**.
 
             ],
 
-            "Jumlah":[
+            "Jumlah": [
 
                 tinggi,
 
@@ -311,7 +324,7 @@ termasuk kelompok **Prioritas Normal**.
 
             ],
 
-            "Persentase":[
+            "Persentase": [
 
                 f"{tinggi_pct:.2f}%",
 
@@ -323,7 +336,7 @@ termasuk kelompok **Prioritas Normal**.
 
         st.dataframe(
 
-            ringkasan,
+            ringkasan_df,
 
             hide_index=True,
 
@@ -332,210 +345,4 @@ termasuk kelompok **Prioritas Normal**.
         )
 
     st.divider()
-    # ======================================================
-# DETAIL CENTROID
-# ======================================================
-
-with st.expander("📐 Detail Nilai Centroid"):
-
-    st.info(
-        """
-Nilai centroid merupakan titik pusat setiap cluster yang
-dihasilkan oleh algoritma K-Means. Informasi ini digunakan
-untuk kebutuhan analisis penelitian.
-        """
-    )
-
-    st.dataframe(
-        centroid_df.round(4),
-        hide_index=True,
-        use_container_width=True
-    )
-
-st.divider()
-
-# ======================================================
-# HASIL INTERPRETASI
-# ======================================================
-
-st.subheader("🎯 Interpretasi Hasil Clustering")
-
-left, right = st.columns(2)
-
-# ======================================================
-# PRIORITAS TINGGI
-# ======================================================
-with left:
-
-    st.markdown(f"""
-<div class="cluster-box cluster-high">
-
-<div class="cluster-title">
-🟧 Transaksi Prioritas Tinggi
-</div>
-
-<div class="cluster-desc">
-Kelompok transaksi dengan beban pelayanan tinggi.
-</div>
-
-<div class="mini-card">
-
-<div class="mini-number">
-
-{tinggi}
-
-</div>
-
-<div class="mini-title">
-
-Jumlah Transaksi
-
-</div>
-
-</div>
-
-<div class="mini-card">
-
-<div class="mini-number">
-
-{tinggi_pct:.2f}%
-
-</div>
-
-<div class="mini-title">
-
-Persentase
-
-</div>
-
-</div>
-
-<div class="section-title">
-
-Karakteristik
-
-</div>
-
-<div class="check-list">
-
-✅ Nilai transaksi lebih tinggi<br>
-
-✅ Jumlah pesanan lebih banyak<br>
-
-✅ Variasi menu lebih beragam<br>
-
-✅ Waktu persiapan lebih lama<br>
-
-✅ Membutuhkan perhatian lebih saat jam sibuk
-
-</div>
-
-<div class="section-title">
-
-💡 Rekomendasi
-
-</div>
-
-<div class="rekom-card">
-
-• Prioritaskan transaksi ini saat antrean padat.<br>
-
-• Pastikan stok bahan baku tersedia.<br>
-
-• Siapkan bahan sebelum jam operasional ramai.<br>
-
-• Tambahkan tenaga kerja ketika volume meningkat.<br>
-
-• Pantau waktu penyelesaian pesanan.
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-    with right:
-
-    st.markdown(f"""
-<div class="cluster-box cluster-normal">
-
-<div class="cluster-title">
-🟩 Transaksi Prioritas Normal
-</div>
-
-<div class="cluster-desc">
-Kelompok transaksi dengan beban pelayanan normal.
-</div>
-
-<div class="mini-card">
-
-<div class="mini-number">
-
-{normal}
-
-</div>
-
-<div class="mini-title">
-
-Jumlah Transaksi
-
-</div>
-
-</div>
-
-<div class="mini-card">
-
-<div class="mini-number">
-
-{normal_pct:.2f}%
-
-</div>
-
-<div class="mini-title">
-
-Persentase
-
-</div>
-
-</div>
-
-<div class="section-title">
-
-Karakteristik
-
-</div>
-
-<div class="check-list">
-
-✅ Nilai transaksi relatif rendah<br>
-
-✅ Jumlah pesanan lebih sedikit<br>
-
-✅ Variasi menu lebih sederhana<br>
-
-✅ Waktu persiapan lebih singkat<br>
-
-✅ Dapat diproses menggunakan SOP standar
-
-</div>
-
-<div class="section-title">
-
-💡 Rekomendasi
-
-</div>
-
-<div class="rekom-card-green">
-
-• Pertahankan kualitas pelayanan.<br>
-
-• Gunakan alur operasional standar.<br>
-
-• Siapkan bahan baku saat waktu senggang.<br>
-
-• Tingkatkan nilai transaksi melalui promosi.<br>
-
-• Evaluasi menu yang kurang diminati.
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
+    
