@@ -27,25 +27,6 @@ def show_kelola_data():
     # INFORMASI
     # ======================================================
 
-    st.info(
-        """
-Silakan upload dataset transaksi Shopee Food.
-
-Format yang didukung:
-
-• CSV (.csv)
-
-• Excel (.xlsx)
-
-• Excel (.xls)
-
-Dataset yang diupload merupakan dataset mentah.
-
-Seluruh proses preprocessing akan dilakukan
-pada menu Preprocessing.
-"""
-    )
-
     st.divider()
 
     # ======================================================
