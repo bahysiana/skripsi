@@ -61,7 +61,9 @@ Analisis Pola Transaksi Shopee Food
     st.divider()
 
     selected = option_menu(
-
+        
+        menu_title="",
+        
         options=[
             "Home",
             "Kelola Data",
