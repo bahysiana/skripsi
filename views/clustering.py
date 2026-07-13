@@ -1,115 +1,174 @@
+import streamlit as st
 import pandas as pd
 
-from sklearn.cluster import KMeans
+from utils.clustering import (
+    run_kmeans,
+    cluster_summary,
+    cluster_profile
+)
 
 
 # ==========================================================
-# KONSTANTA
+# CLUSTERING
 # ==========================================================
 
-N_CLUSTER = 2
+def show_clustering():
 
-RANDOM_STATE = 42
+    st.title("📊 Clustering")
 
+    st.caption(
+        "Analisis Pola Transaksi Menggunakan Metode K-Means Clustering."
+    )
 
-# ==========================================================
-# PROSES K-MEANS
-# ==========================================================
+    st.divider()
 
-def run_kmeans(df: pd.DataFrame):
-    """
-    Menjalankan proses K-Means Clustering.
-    """
+    # ======================================================
+    # CEK PREPROCESSING
+    # ======================================================
 
-    model = KMeans(
+    if "normalized_df" not in st.session_state:
 
-        n_clusters=N_CLUSTER,
+        st.warning(
+            """
+Dataset hasil preprocessing belum tersedia.
 
-        random_state=RANDOM_STATE,
+Silakan lakukan preprocessing terlebih dahulu.
+            """
+        )
 
-        n_init=10
+        return
+
+    normalized_df = st.session_state["normalized_df"]
+
+    # ======================================================
+    # PREVIEW DATA
+    # ======================================================
+
+    st.subheader("📂 Dataset Hasil Preprocessing")
+
+    st.dataframe(
+
+        normalized_df,
+
+        use_container_width=True,
+
+        hide_index=True
 
     )
 
-    cluster = model.fit_predict(df)
+    st.divider()
 
-    result = df.copy()
+    # ======================================================
+    # PROSES CLUSTERING
+    # ======================================================
 
-    result["Cluster"] = cluster
+    if st.button(
 
-    centroid = pd.DataFrame(
+        "🚀 Proses Clustering",
 
-        model.cluster_centers_,
+        type="primary",
 
-        columns=df.columns
+        use_container_width=True
 
-    )
+    ):
 
-    return result, centroid, model
+        with st.spinner("Sedang menjalankan K-Means..."):
 
+            result_df, centroid_df, model = run_kmeans(
 
-# ==========================================================
-# RINGKASAN CLUSTER
-# ==========================================================
+                normalized_df
 
-def cluster_summary(df: pd.DataFrame):
-    """
-    Menghitung jumlah anggota setiap cluster.
-    """
+            )
 
-    summary = (
+        summary_df = cluster_summary(result_df)
 
-        df["Cluster"]
+        profile_df = cluster_profile(result_df)
 
-        .value_counts()
+        st.session_state["cluster_result"] = result_df
+        st.session_state["cluster_centroid"] = centroid_df
+        st.session_state["cluster_summary"] = summary_df
+        st.session_state["cluster_profile"] = profile_df
 
-        .sort_index()
+        st.success(
+            "Proses Clustering berhasil dilakukan."
+        )
 
-        .reset_index()
+        st.divider()
 
-    )
+        # ==================================================
+        # HASIL CLUSTER
+        # ==================================================
 
-    summary.columns = [
+        st.subheader("📋 Hasil Clustering")
 
-        "Cluster",
+        st.dataframe(
 
-        "Jumlah_Data"
+            result_df,
 
-    ]
+            use_container_width=True,
 
-    summary["Persentase"] = (
+            hide_index=True
 
-        summary["Jumlah_Data"]
+        )
 
-        / summary["Jumlah_Data"].sum()
+        st.divider()
 
-        * 100
+        # ==================================================
+        # CENTROID
+        # ==================================================
 
-    ).round(2)
+        st.subheader("🎯 Nilai Centroid")
 
-    return summary
+        st.dataframe(
 
+            centroid_df,
 
-# ==========================================================
-# RATA-RATA SETIAP CLUSTER
-# ==========================================================
+            use_container_width=True,
 
-def cluster_profile(df: pd.DataFrame):
-    """
-    Menghitung rata-rata setiap variabel
-    berdasarkan cluster.
-    """
+            hide_index=True
 
-    profile = (
+        )
 
-        df
+        st.divider()
 
-        .groupby("Cluster")
+        # ==================================================
+        # RINGKASAN
+        # ==================================================
 
-        .mean(numeric_only=True)
+        st.subheader("📈 Ringkasan Cluster")
 
-        .round(4)
+        st.dataframe(
 
-    )
+            summary_df,
 
-    return profile
+            use_container_width=True,
+
+            hide_index=True
+
+        )
+
+        st.divider()
+
+        # ==================================================
+        # PROFIL CLUSTER
+        # ==================================================
+
+        st.subheader("📊 Profil Cluster")
+
+        st.dataframe(
+
+            profile_df,
+
+            use_container_width=True
+
+        )
+
+        st.divider()
+
+        st.success(
+            """
+Proses clustering selesai.
+
+Silakan lanjut melihat interpretasi dan rekomendasi cluster.
+            """
+        )
