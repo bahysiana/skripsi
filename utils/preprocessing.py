@@ -7,48 +7,43 @@ from sklearn.preprocessing import MinMaxScaler
 # DATA CLEANING
 # ==========================================================
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Membersihkan dataset.
-    """
+def clean_data(df: pd.DataFrame):
 
     df = df.copy()
 
-    # Menghapus spasi pada nama kolom
+    # Hilangkan spasi nama kolom
     df.columns = df.columns.str.strip()
 
-    # Menghapus data duplikat
+    # Hilangkan duplikat
     df = df.drop_duplicates()
 
-    # Menghapus data kosong
-    df = df.dropna()
+    # Hilangkan data kosong
+    df = df.dropna(how="all")
 
     return df
 
 
 # ==========================================================
-# HITUNG JUMLAH JENIS MENU
+# JUMLAH JENIS MENU
 # ==========================================================
 
-def count_menu_types(menu) -> int:
-    """
-    Menghitung jumlah jenis menu yang dibeli.
-    """
+def count_menu_types(menu):
 
     if pd.isna(menu):
         return 0
 
-    menu_list = [
+    menu = str(menu).strip()
 
-        item.strip()
+    if menu == "":
+        return 0
 
-        for item in str(menu).split(",")
-
-        if item.strip()
-
-    ]
-
-    return len(menu_list)
+    return len(
+        [
+            x.strip()
+            for x in menu.split(",")
+            if x.strip()
+        ]
+    )
 
 
 # ==========================================================
@@ -56,15 +51,13 @@ def count_menu_types(menu) -> int:
 # ==========================================================
 
 def convert_minutes(value):
-    """
-    Mengubah teks:
-    '13 menit' -> 13
-    """
 
     if pd.isna(value):
         return None
 
-    angka = re.findall(r"\d+", str(value))
+    value = str(value).lower().strip()
+
+    angka = re.findall(r"\d+", value)
 
     if len(angka) == 0:
         return None
@@ -73,23 +66,42 @@ def convert_minutes(value):
 
 
 # ==========================================================
+# KONVERSI ANGKA
+# ==========================================================
+
+def convert_numeric(value):
+
+    if pd.isna(value):
+        return None
+
+    text = str(value)
+
+    text = text.replace("Rp", "")
+    text = text.replace("rp", "")
+    text = text.replace(".", "")
+    text = text.replace(",", "")
+    text = text.strip()
+
+    angka = re.findall(r"\d+", text)
+
+    if len(angka) == 0:
+        return None
+
+    return int("".join(angka))
+
+
+# ==========================================================
 # FEATURE ENGINEERING
 # ==========================================================
 
-def feature_engineering(df: pd.DataFrame):
-    """
-    Feature engineering.
-    """
+def feature_engineering(df):
 
     df = df.copy()
 
-    # Jumlah jenis menu
-
-    df["Jumlah_jenis_menu"] = df["menu_yang_dibeli"].apply(
-        count_menu_types
+    df["Jumlah_jenis_menu"] = (
+        df["menu_yang_dibeli"]
+        .apply(count_menu_types)
     )
-
-    # Konversi waktu persiapan
 
     df["waktu_persiapan_yang_diberikan"] = (
         df["waktu_persiapan_yang_diberikan"]
@@ -99,6 +111,16 @@ def feature_engineering(df: pd.DataFrame):
     df["waktu_persiapan_digunakan"] = (
         df["waktu_persiapan_digunakan"]
         .apply(convert_minutes)
+    )
+
+    df["Total_harga"] = (
+        df["Total_harga"]
+        .apply(convert_numeric)
+    )
+
+    df["Jumlah_pesanan"] = (
+        df["Jumlah_pesanan"]
+        .apply(convert_numeric)
     )
 
     return df
@@ -127,7 +149,7 @@ FEATURE_COLUMNS = [
 # SELECT FEATURE
 # ==========================================================
 
-def select_features(df: pd.DataFrame):
+def select_features(df):
 
     kolom_hilang = [
 
@@ -143,26 +165,24 @@ def select_features(df: pd.DataFrame):
 
         raise ValueError(
 
-            "Kolom berikut tidak ditemukan:\n\n"
+            "Kolom tidak ditemukan:\n\n"
 
             + "\n".join(kolom_hilang)
 
         )
 
-    feature_df = df[FEATURE_COLUMNS].copy()
-
-    return feature_df
+    return df[FEATURE_COLUMNS].copy()
 
 
 # ==========================================================
-# MIN MAX NORMALIZATION
+# MIN MAX
 # ==========================================================
 
-def minmax_normalization(df: pd.DataFrame):
+def minmax_normalization(df):
 
     numeric_df = df.copy()
 
-    # Pastikan seluruh kolom numerik
+    # Pastikan numerik
 
     for col in numeric_df.columns:
 
@@ -174,23 +194,43 @@ def minmax_normalization(df: pd.DataFrame):
 
         )
 
-    # Cek apakah ada nilai kosong
+    # DEBUG
 
-    if numeric_df.isnull().sum().sum() > 0:
+    if numeric_df.isnull().any().any():
 
-        raise ValueError(
-            "Masih terdapat data yang bukan numerik pada variabel penelitian."
-        )
+        pesan = ""
+
+        for col in numeric_df.columns:
+
+            if numeric_df[col].isnull().any():
+
+                pesan += f"\nKolom : {col}\n"
+
+                pesan += str(
+
+                    df.loc[
+
+                        numeric_df[col].isnull(),
+
+                        col
+
+                    ].head()
+
+                )
+
+                pesan += "\n"
+
+        raise ValueError(pesan)
 
     scaler = MinMaxScaler()
 
-    normalized = scaler.fit_transform(
+    hasil = scaler.fit_transform(
         numeric_df
     )
 
-    normalized_df = pd.DataFrame(
+    return pd.DataFrame(
 
-        normalized,
+        hasil,
 
         columns=numeric_df.columns,
 
@@ -198,22 +238,12 @@ def minmax_normalization(df: pd.DataFrame):
 
     )
 
-    return normalized_df
-
 
 # ==========================================================
 # PREPROCESS DATASET
 # ==========================================================
 
-def preprocess_dataset(df: pd.DataFrame):
-    """
-    Pipeline preprocessing.
-
-    1. Data Cleaning
-    2. Feature Engineering
-    3. Select Feature
-    4. Min-Max Normalization
-    """
+def preprocess_dataset(df):
 
     # Cleaning
 
@@ -225,7 +255,7 @@ def preprocess_dataset(df: pd.DataFrame):
         cleaned_df
     )
 
-    # Variabel Penelitian
+    # Variabel
 
     feature_df = select_features(
         engineered_df
