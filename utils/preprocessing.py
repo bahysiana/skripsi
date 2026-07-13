@@ -4,32 +4,23 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 # ==========================================================
-# DATA CLEANING
+# MEMBERSIHKAN DATA
 # ==========================================================
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Membersihkan dataset transaksi.
+    Membersihkan dataset sebelum preprocessing.
     """
 
     df = df.copy()
 
-    # ------------------------------------------------------
-    # Menghapus spasi pada nama kolom
-    # ------------------------------------------------------
-
+    # Hilangkan spasi nama kolom
     df.columns = df.columns.str.strip()
 
-    # ------------------------------------------------------
-    # Menghapus duplikat
-    # ------------------------------------------------------
-
+    # Hapus duplikat
     df = df.drop_duplicates()
 
-    # ------------------------------------------------------
-    # Menghapus baris yang seluruh isinya kosong
-    # ------------------------------------------------------
-
+    # Hapus baris yang seluruhnya kosong
     df = df.dropna(how="all")
 
     return df
@@ -39,33 +30,65 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 # HITUNG JUMLAH JENIS MENU
 # ==========================================================
 
-def count_menu_types(menu) -> int:
-    """
-    Menghitung jumlah jenis menu berdasarkan
-    kolom menu_yang_dibeli.
-    """
+def count_menu_types(menu):
 
     if pd.isna(menu):
-
         return 0
 
     menu = str(menu).strip()
 
     if menu == "":
-
         return 0
 
-    daftar_menu = [
-
+    daftar = [
         item.strip()
-
         for item in menu.split(",")
-
         if item.strip()
-
     ]
 
-    return len(daftar_menu)
+    return len(daftar)
+
+
+# ==========================================================
+# KONVERSI TOTAL HARGA
+# ==========================================================
+
+def convert_total_harga(value):
+
+    if pd.isna(value):
+        return None
+
+    text = str(value)
+
+    text = text.replace("Rp", "")
+    text = text.replace("rp", "")
+    text = text.replace(".", "")
+    text = text.replace(",", "")
+    text = text.strip()
+
+    angka = re.findall(r"\d+", text)
+
+    if len(angka) == 0:
+        return None
+
+    return int("".join(angka))
+
+
+# ==========================================================
+# KONVERSI JUMLAH PESANAN
+# ==========================================================
+
+def convert_jumlah_pesanan(value):
+
+    if pd.isna(value):
+        return None
+
+    angka = re.findall(r"\d+", str(value))
+
+    if len(angka) == 0:
+        return None
+
+    return int(angka[0])
 
 
 # ==========================================================
@@ -73,157 +96,78 @@ def count_menu_types(menu) -> int:
 # ==========================================================
 
 def convert_minutes(value):
-    """
-    Contoh:
-
-    13 menit -> 13
-
-    8 menit -> 8
-
-    - -> None
-    """
 
     if pd.isna(value):
-
         return None
 
     text = str(value).strip().lower()
 
-    # -------------------------------
-    # Nilai kosong
-    # -------------------------------
-
     if text in [
-
         "",
-
         "-",
-
         "--",
-
         "nan",
-
         "none"
-
     ]:
-
         return None
 
     angka = re.findall(r"\d+", text)
 
     if len(angka) == 0:
-
         return None
 
     return int(angka[0])
-
-
-# ==========================================================
-# KONVERSI ANGKA
-# ==========================================================
-
-def convert_numeric(value):
-    """
-    Mengubah berbagai format angka menjadi integer.
-
-    Contoh:
-
-    Rp30.000 -> 30000
-
-    30.000 -> 30000
-
-    30000 -> 30000
-    """
-
-    if pd.isna(value):
-
-        return None
-
-    text = str(value).strip()
-
-    if text in [
-
-        "",
-
-        "-",
-
-        "--",
-
-        "nan",
-
-        "None"
-
-    ]:
-
-        return None
-
-    text = text.replace("Rp", "")
-
-    text = text.replace("rp", "")
-
-    text = text.replace(".", "")
-
-    text = text.replace(",", "")
-
-    text = text.replace(" ", "")
-
-    angka = re.findall(r"\d+", text)
-
-    if len(angka) == 0:
-
-        return None
-
-    return int("".join(angka))
     # ==========================================================
 # FEATURE ENGINEERING
 # ==========================================================
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Menambahkan variabel penelitian yang dibutuhkan.
+    Menambahkan variabel yang dibutuhkan
+    pada proses clustering.
     """
 
     df = df.copy()
 
-    # ======================================================
-    # JUMLAH JENIS MENU
-    # ======================================================
+    # ------------------------------------------------------
+    # Jumlah Jenis Menu
+    # ------------------------------------------------------
 
     df["Jumlah_jenis_menu"] = (
         df["menu_yang_dibeli"]
         .apply(count_menu_types)
     )
 
-    # ======================================================
-    # TOTAL HARGA
-    # ======================================================
+    # ------------------------------------------------------
+    # Total Harga
+    # ------------------------------------------------------
 
     df["Total_harga"] = (
         df["Total_harga"]
-        .apply(convert_numeric)
+        .apply(convert_total_harga)
     )
 
-    # ======================================================
-    # JUMLAH PESANAN
-    # ======================================================
+    # ------------------------------------------------------
+    # Jumlah Pesanan
+    # ------------------------------------------------------
 
     df["Jumlah_pesanan"] = (
         df["Jumlah_pesanan"]
-        .apply(convert_numeric)
+        .apply(convert_jumlah_pesanan)
     )
 
-    # ======================================================
-    # WAKTU YANG DIBERIKAN
-    # ======================================================
+    # ------------------------------------------------------
+    # Waktu Persiapan yang Diberikan
+    # ------------------------------------------------------
 
     df["waktu_persiapan_yang_diberikan"] = (
         df["waktu_persiapan_yang_diberikan"]
         .apply(convert_minutes)
     )
 
-    # ======================================================
-    # WAKTU DIGUNAKAN
-    # ======================================================
+    # ------------------------------------------------------
+    # Waktu Persiapan yang Digunakan
+    # ------------------------------------------------------
 
     df["waktu_persiapan_digunakan"] = (
         df["waktu_persiapan_digunakan"]
@@ -258,14 +202,15 @@ FEATURE_COLUMNS = [
 
 def select_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Mengambil variabel penelitian.
+    Mengambil variabel penelitian dan
+    memastikan seluruh data numerik.
     """
 
-    df = df.copy()
+    feature_df = df.copy()
 
-    # ======================================================
-    # VALIDASI KOLOM
-    # ======================================================
+    # ------------------------------------------------------
+    # Validasi Kolom
+    # ------------------------------------------------------
 
     kolom_hilang = [
 
@@ -273,7 +218,7 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
 
         for col in FEATURE_COLUMNS
 
-        if col not in df.columns
+        if col not in feature_df.columns
 
     ]
 
@@ -287,17 +232,35 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
 
         )
 
-    feature_df = df[FEATURE_COLUMNS].copy()
+    # ------------------------------------------------------
+    # Ambil Variabel Penelitian
+    # ------------------------------------------------------
 
-    # ======================================================
-    # HAPUS BARIS TIDAK VALID
-    # ======================================================
+    feature_df = feature_df[FEATURE_COLUMNS].copy()
+
+    # ------------------------------------------------------
+    # Konversi Seluruh Kolom Menjadi Numerik
+    # ------------------------------------------------------
+
+    for col in feature_df.columns:
+
+        feature_df[col] = pd.to_numeric(
+
+            feature_df[col],
+
+            errors="coerce"
+
+        )
+
+    # ------------------------------------------------------
+    # Hapus Data yang Tidak Valid
+    # ------------------------------------------------------
 
     feature_df = feature_df.dropna()
 
-    # ======================================================
-    # RESET INDEX
-    # ======================================================
+    # ------------------------------------------------------
+    # Reset Index
+    # ------------------------------------------------------
 
     feature_df = feature_df.reset_index(drop=True)
 
@@ -306,86 +269,32 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
 # MIN MAX NORMALIZATION
 # ==========================================================
 
-def minmax_normalization(df: pd.DataFrame) -> pd.DataFrame:
+def minmax_normalization(feature_df: pd.DataFrame) -> pd.DataFrame:
     """
     Melakukan normalisasi menggunakan
     Min-Max Normalization.
     """
 
-    numeric_df = df.copy()
-
-    # ======================================================
-    # PASTIKAN SELURUH DATA NUMERIK
-    # ======================================================
-
-    for col in numeric_df.columns:
-
-        numeric_df[col] = pd.to_numeric(
-
-            numeric_df[col],
-
-            errors="coerce"
-
-        )
-
-    # ======================================================
-    # HAPUS DATA YANG TIDAK VALID
-    # ======================================================
-
-    before_rows = len(numeric_df)
-
-    numeric_df = numeric_df.dropna()
-
-    after_rows = len(numeric_df)
-
-    # ======================================================
-    # VALIDASI
-    # ======================================================
-
-    if numeric_df.empty:
-
-        raise ValueError(
-            "Seluruh data hasil preprocessing kosong. "
-            "Periksa kembali dataset yang diupload."
-        )
-
-    # ======================================================
-    # INFORMASI BARIS YANG DIHAPUS
-    # ======================================================
-
-    removed_rows = before_rows - after_rows
-
-    if removed_rows > 0:
-
-        print(
-            f"{removed_rows} baris tidak valid dihapus "
-            "karena mengandung nilai kosong atau tidak numerik."
-        )
-
-    # ======================================================
-    # MIN MAX SCALER
-    # ======================================================
-
     scaler = MinMaxScaler()
 
     normalized = scaler.fit_transform(
-
-        numeric_df
-
+        feature_df
     )
 
     normalized_df = pd.DataFrame(
 
         normalized,
 
-        columns=numeric_df.columns,
+        columns=feature_df.columns,
 
-        index=numeric_df.index
+        index=feature_df.index
 
     )
 
     return normalized_df
-    # ==========================================================
+
+
+# ==========================================================
 # PREPROCESS DATASET
 # ==========================================================
 
@@ -398,17 +307,6 @@ def preprocess_dataset(df: pd.DataFrame):
     2. Feature Engineering
     3. Pemilihan Variabel
     4. Min-Max Normalization
-
-    Returns
-    -------
-    original_df
-        Dataset setelah cleaning dan feature engineering.
-
-    feature_df
-        Dataset variabel penelitian.
-
-    normalized_df
-        Dataset hasil normalisasi Min-Max.
     """
 
     # ======================================================
@@ -421,40 +319,60 @@ def preprocess_dataset(df: pd.DataFrame):
     # FEATURE ENGINEERING
     # ======================================================
 
-    engineered_df = feature_engineering(cleaned_df)
+    engineered_df = feature_engineering(
+        cleaned_df
+    )
 
     # ======================================================
     # VARIABEL PENELITIAN
     # ======================================================
 
-    feature_df = select_features(engineered_df)
+    feature_df = select_features(
+        engineered_df
+    )
+
+    # ======================================================
+    # MENYESUAIKAN DATASET
+    # ======================================================
+
+    engineered_df = engineered_df.loc[
+        feature_df.index
+    ].copy()
 
     # ======================================================
     # NORMALISASI
     # ======================================================
 
-    normalized_df = minmax_normalization(feature_df)
+    normalized_df = minmax_normalization(
+        feature_df
+    )
 
     # ======================================================
-    # SAMAKAN INDEX
+    # RESET INDEX
     # ======================================================
 
-    feature_df = feature_df.loc[
-        normalized_df.index
-    ].reset_index(drop=True)
+    engineered_df = engineered_df.reset_index(
+        drop=True
+    )
 
-    engineered_df = engineered_df.loc[
-        normalized_df.index
-    ].reset_index(drop=True)
+    feature_df = feature_df.reset_index(
+        drop=True
+    )
 
-    normalized_df = normalized_df.reset_index(drop=True)
+    normalized_df = normalized_df.reset_index(
+        drop=True
+    )
 
     # ======================================================
     # RETURN
     # ======================================================
 
     return (
+
         engineered_df,
+
         feature_df,
+
         normalized_df
+
     )
