@@ -404,3 +404,184 @@ dalam menentukan karakteristik masing-masing cluster.
     st.subheader("🎯 Interpretasi Hasil Clustering")
 
     left, right = st.columns(2)
+        # ======================================================
+    # TRANSAKSI PRIORITAS TINGGI
+    # ======================================================
+
+    with left:
+
+        with st.container(border=True):
+
+            st.markdown("## 🟧 Transaksi Prioritas Tinggi")
+
+            st.caption(
+                """
+Kelompok transaksi yang memiliki karakteristik nilai transaksi,
+jumlah pesanan, dan waktu pelayanan yang relatif lebih tinggi.
+                """
+            )
+
+            st.divider()
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.metric(
+                    "Jumlah Transaksi",
+                    tinggi
+                )
+
+            with col2:
+
+                st.metric(
+                    "Persentase",
+                    f"{tinggi_pct:.2f}%"
+                )
+
+            st.divider()
+
+            st.markdown("### 📌 Karakteristik")
+
+            karakteristik_tinggi = [
+                "Nilai transaksi cenderung lebih tinggi.",
+                "Jumlah pesanan relatif lebih banyak.",
+                "Variasi menu yang dipesan lebih beragam.",
+                "Waktu persiapan relatif lebih lama.",
+                "Perlu menjadi prioritas saat jam operasional ramai."
+            ]
+
+            for item in karakteristik_tinggi:
+
+                st.markdown(f"✅ {item}")
+
+            st.divider()
+
+            st.markdown("### 💡 Rekomendasi")
+
+            rekomendasi_tinggi = [
+                "Prioritaskan proses pelayanan pada transaksi ini.",
+                "Pastikan stok bahan baku selalu tersedia.",
+                "Siapkan bahan makanan sebelum jam sibuk.",
+                "Tambahkan tenaga kerja saat volume transaksi meningkat.",
+                "Pantau waktu penyelesaian pesanan agar sesuai estimasi."
+            ]
+
+            for item in rekomendasi_tinggi:
+
+                st.markdown(f"• {item}")
+                    # ======================================================
+    # TRANSAKSI PRIORITAS NORMAL
+    # ======================================================
+
+    with right:
+
+        with st.container(border=True):
+
+            st.markdown("## 🟩 Transaksi Prioritas Normal")
+
+            st.caption(
+                """
+Kelompok transaksi yang memiliki karakteristik nilai transaksi,
+jumlah pesanan, dan waktu pelayanan yang relatif lebih rendah.
+                """
+            )
+
+            st.divider()
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.metric(
+                    "Jumlah Transaksi",
+                    normal
+                )
+
+            with col2:
+
+                st.metric(
+                    "Persentase",
+                    f"{normal_pct:.2f}%"
+                )
+
+            st.divider()
+
+            st.markdown("### 📌 Karakteristik")
+
+            karakteristik_normal = [
+
+                "Nilai transaksi relatif lebih rendah.",
+
+                "Jumlah pesanan relatif lebih sedikit.",
+
+                "Variasi menu yang dipesan lebih sederhana.",
+
+                "Waktu persiapan relatif lebih singkat.",
+
+                "Dapat diproses menggunakan alur operasional standar."
+
+            ]
+
+            for item in karakteristik_normal:
+
+                st.markdown(f"✅ {item}")
+
+            st.divider()
+
+            st.markdown("### 💡 Rekomendasi")
+
+            rekomendasi_normal = [
+
+                "Pertahankan kualitas pelayanan yang sudah berjalan.",
+
+                "Gunakan prosedur operasional standar.",
+
+                "Siapkan bahan baku pada waktu senggang.",
+
+                "Tingkatkan nilai transaksi melalui paket menu atau promosi.",
+
+                "Evaluasi menu yang kurang diminati pelanggan."
+
+            ]
+
+            for item in rekomendasi_normal:
+
+                st.markdown(f"• {item}")
+
+    st.divider()
+
+    # ======================================================
+    # PROFIL CLUSTER
+    # ======================================================
+
+    st.subheader("📊 Profil Rata-rata Setiap Cluster")
+
+    profile_df = cluster_profile(result_df)
+
+    st.dataframe(
+
+        profile_df,
+
+        use_container_width=True,
+
+        hide_index=False
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # PENUTUP
+    # ======================================================
+
+    st.success(
+        """
+Proses K-Means Clustering berhasil dilakukan.
+
+Hasil pengelompokan transaksi ini dapat digunakan sebagai
+dasar untuk memahami pola transaksi pelanggan serta membantu
+Buffet The Padang Pasir dalam menentukan prioritas pelayanan
+dan pengelolaan operasional berdasarkan karakteristik transaksi.
+        """
+    )
