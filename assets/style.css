@@ -1489,3 +1489,128 @@ header{
     font-weight:600;
 
 }
+/* ==========================================================
+   DASHBOARD CLUSTER
+========================================================== */
+
+.cluster-box{
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    height:100%;
+
+}
+
+.cluster-high{
+
+    border-top:6px solid #ff7a00;
+
+}
+
+.cluster-normal{
+
+    border-top:6px solid #34a853;
+
+}
+
+.cluster-title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    margin-bottom:5px;
+
+}
+
+.cluster-desc{
+
+    color:#777;
+
+    margin-bottom:25px;
+
+}
+
+.mini-card{
+
+    background:#f8f9fa;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    text-align:center;
+
+    border:1px solid #ececec;
+
+    margin-bottom:15px;
+
+}
+
+.mini-number{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+}
+
+.mini-title{
+
+    color:#666;
+
+    font-size:14px;
+
+}
+
+.section-title{
+
+    font-weight:700;
+
+    margin-top:20px;
+
+    margin-bottom:10px;
+
+    font-size:18px;
+
+}
+
+.check-list{
+
+    line-height:2;
+
+}
+
+.rekom-card{
+
+    background:#f7f7f7;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-top:15px;
+
+    border-left:4px solid #ff7a00;
+
+}
+
+.rekom-card-green{
+
+    background:#f7f7f7;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-top:15px;
+
+    border-left:4px solid #34a853;
+
+}
