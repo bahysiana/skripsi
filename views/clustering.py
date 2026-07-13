@@ -65,31 +65,41 @@ K-Means Clustering.
     # BUTTON
     # ======================================================
 
-    col_btn, col_info = st.columns([1, 5])
-
-    with col_btn:
-
-        mulai = st.button(
-
-            "🚀 Jalankan",
-
-            type="primary",
-
-            use_container_width=True
-
-        )
-
-    with col_info:
-
-        st.empty()
-
-    if not mulai:
-
-        return
-
     # ======================================================
-    # PROSES CLUSTERING
-    # ======================================================
+# INISIALISASI SESSION
+# ======================================================
+
+if "cluster_df" not in st.session_state:
+
+    st.session_state["cluster_df"] = None
+
+if "centroid_df" not in st.session_state:
+
+    st.session_state["centroid_df"] = None
+
+# ======================================================
+# BUTTON
+# ======================================================
+
+col_btn, col_info = st.columns([1, 5])
+
+with col_btn:
+
+    mulai = st.button(
+
+        "🚀 Jalankan",
+
+        type="primary",
+
+        use_container_width=True
+
+    )
+
+with col_info:
+
+    st.empty()
+
+    if mulai:
 
     with st.spinner("Sedang melakukan proses clustering..."):
 
@@ -101,22 +111,30 @@ K-Means Clustering.
 
         )
 
-    st.success(
-        "Proses clustering berhasil dilakukan."
-    )
-
-    # ======================================================
-    # SESSION
-    # ======================================================
-
     st.session_state["cluster_df"] = result_df
 
     st.session_state["centroid_df"] = centroid_df
+
+    st.success(
+        "Proses clustering berhasil dilakukan."
+    )
+    # ======================================================
+# AMBIL HASIL DARI SESSION
+# ======================================================
+
+if st.session_state["cluster_df"] is None:
+
+    return
+
+result_df = st.session_state["cluster_df"]
+
+centroid_df = st.session_state["centroid_df"]
 
     # ======================================================
     # RINGKASAN
     # ======================================================
 
+    
     summary = cluster_summary(result_df)
 
     total_data = len(result_df)
