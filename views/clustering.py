@@ -345,4 +345,219 @@ dan pengambilan keputusan operasional pada Buffet The Padang Pasir.
         )
 
     st.divider()
+        # ======================================================
+    # DETAIL CENTROID
+    # ======================================================
+
+    st.subheader("📐 Detail Hasil Perhitungan")
+
+    with st.expander("Lihat Nilai Centroid"):
+
+        st.markdown("""
+Nilai centroid merupakan titik pusat masing-masing cluster yang
+dihasilkan oleh algoritma K-Means. Informasi ini digunakan sebagai
+acuan dalam proses pengelompokan transaksi.
+        """)
+
+        st.dataframe(
+
+            centroid_df.round(4),
+
+            hide_index=True,
+
+            use_container_width=True
+
+        )
+
+    st.divider()
+
+    # ======================================================
+    # INTERPRETASI
+    # ======================================================
+
+    st.subheader("🎯 Interpretasi Hasil Clustering")
+
+    left, right = st.columns(2)
+        # ======================================================
+    # CARD PRIORITAS TINGGI
+    # ======================================================
+
+    with left:
+
+        st.markdown(
+            """
+            <div class="cluster-box cluster-high">
+            <div class="cluster-title">
+            🟧 Transaksi Prioritas Tinggi
+            </div>
+
+            <div class="cluster-desc">
+            Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
+            variasi menu, dan waktu pelayanan yang relatif lebih tinggi.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # -----------------------------
+        # KPI
+        # -----------------------------
+
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+
+            st.markdown(f"""
+            <div class="mini-card">
+                <div class="mini-number">{tinggi}</div>
+                <div class="mini-title">Jumlah Transaksi</div>
+            </div>
+            """,
+            unsafe_allow_html=True)
+
+        with col_b:
+
+            st.markdown(f"""
+            <div class="mini-card">
+                <div class="mini-number">{tinggi_pct:.2f}%</div>
+                <div class="mini-title">Persentase</div>
+            </div>
+            """,
+            unsafe_allow_html=True)
+
+        st.markdown("### 📌 Karakteristik")
+
+        st.markdown("""
+- ✅ Nilai transaksi relatif lebih tinggi.
+- ✅ Jumlah pesanan lebih banyak.
+- ✅ Variasi menu lebih beragam.
+- ✅ Waktu persiapan lebih lama.
+- ✅ Memerlukan perhatian lebih ketika jam operasional ramai.
+        """)
+
+        st.markdown("### 💡 Rekomendasi")
+
+        st.success("""
+1. Prioritaskan transaksi pada kelompok ini ketika antrean meningkat.
+
+2. Pastikan stok bahan baku selalu tersedia.
+
+3. Lakukan persiapan bahan sebelum jam sibuk.
+
+4. Tambahkan tenaga kerja ketika volume transaksi meningkat.
+
+5. Pantau waktu penyelesaian agar sesuai estimasi Shopee Food.
+        """)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+            # ======================================================
+    # CARD PRIORITAS NORMAL
+    # ======================================================
+
+    with right:
+
+        st.markdown(
+            """
+            <div class="cluster-box cluster-normal">
+            <div class="cluster-title">
+            🟩 Transaksi Prioritas Normal
+            </div>
+
+            <div class="cluster-desc">
+            Kelompok transaksi dengan nilai transaksi, jumlah pesanan,
+            variasi menu, dan waktu pelayanan yang relatif lebih rendah.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # -----------------------------
+        # KPI
+        # -----------------------------
+
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+
+            st.markdown(
+                f"""
+                <div class="mini-card">
+                    <div class="mini-number">
+                        {normal}
+                    </div>
+
+                    <div class="mini-title">
+                        Jumlah Transaksi
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with col_b:
+
+            st.markdown(
+                f"""
+                <div class="mini-card">
+                    <div class="mini-number">
+                        {normal_pct:.2f}%
+                    </div>
+
+                    <div class="mini-title">
+                        Persentase
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        # -----------------------------
+        # KARAKTERISTIK
+        # -----------------------------
+
+        st.markdown("### 📌 Karakteristik")
+
+        st.markdown("""
+- ✅ Nilai transaksi relatif lebih rendah.
+- ✅ Jumlah pesanan lebih sedikit.
+- ✅ Variasi menu lebih sederhana.
+- ✅ Waktu persiapan relatif lebih singkat.
+- ✅ Dapat diproses menggunakan alur operasional standar.
+        """)
+
+        # -----------------------------
+        # REKOMENDASI
+        # -----------------------------
+
+        st.markdown("### 💡 Rekomendasi")
+
+        st.info("""
+1. Pertahankan kualitas pelayanan yang sudah berjalan.
+
+2. Gunakan prosedur operasional standar dalam proses pelayanan.
+
+3. Manfaatkan waktu senggang untuk menyiapkan bahan baku.
+
+4. Tingkatkan nilai transaksi melalui paket menu atau promosi.
+
+5. Evaluasi menu yang kurang diminati pelanggan sebagai bahan pengembangan produk.
+        """)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
+
+    # ======================================================
+    # FOOTER
+    # ======================================================
+
+    st.success(
+        """
+Analisis clustering telah selesai dilakukan.
+
+Hasil pengelompokan ini dapat digunakan sebagai dasar dalam
+menentukan prioritas pelayanan transaksi Shopee Food pada
+Buffet The Padang Pasir.
+        """
+    )
     
