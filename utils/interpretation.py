@@ -85,10 +85,6 @@ def generate_interpretation(profile_df: pd.DataFrame):
 
             "Manfaatkan waktu luang untuk menyiapkan bahan baku.",
 
-            "Dorong pelanggan meningkatkan nilai transaksi melalui paket menu.",
-
-            "Evaluasi menu yang kurang diminati pelanggan.",
-
             "Pertahankan konsistensi waktu penyajian pesanan.",
 
             "Gunakan hasil cluster sebagai pendukung evaluasi operasional toko."
