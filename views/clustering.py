@@ -469,13 +469,13 @@ persiapan yang relatif lebih tinggi.
 
                 "Prioritaskan penanganan transaksi pada kelompok ini agar proses pelayanan tetap optimal.",
 
-                "Pastikan ketersediaan bahan baku untuk menu yang sering muncul pada kelompok transaksi ini.",
+                "Pastikan ketersediaan bahan baku untuk memenuhi kebutuhan transaksi dengan beban pelayanan tinggi.",
 
-                "Lakukan pembagian tugas karyawan secara efektif ketika menangani transaksi dengan beban pelayanan tinggi.",
+                "Atur pembagian tugas karyawan secara efektif agar proses pelayanan dapat dilakukan secara lebih optimal.",
 
-                "Lakukan pemantauan terhadap waktu persiapan agar tetap sesuai estimasi kepada pelanggan.",
+                "Lakukan pemantauan terhadap waktu persiapan pesanan untuk menjaga ketepatan pelayanan kepada pelanggan.",
 
-                "Gunakan hasil analisis sebagai dasar evaluasi operasional toko."
+                "Gunakan hasil analisis cluster sebagai dasar dalam penyusunan strategi operasional dan peningkatan kualitas pelayanan."
 
             ]
 
@@ -547,15 +547,15 @@ persiapan yang relatif lebih rendah.
 
             rekomendasi_rendah = [
 
-                "Pertahankan kualitas pelayanan yang telah berjalan.",
+                "Pertahankan kualitas pelayanan yang telah berjalan agar kepuasan pelanggan tetap terjaga.",
 
-                "Gunakan prosedur operasional secara konsisten.",
+                "Laksanakan proses pelayanan sesuai dengan prosedur operasional yang telah diterapkan untuk menjaga konsistensi pelayanan.",
 
                 "Manfaatkan hasil analisis sebagai dasar pengelolaan sumber daya.",
 
-                "Evaluasi menu yang kurang diminati sebagai bahan pengembangan produk.",
+                "Lakukan evaluasi terhadap pola transaksi pada kelompok ini untuk mendukung peningkatan kualitas pelayanan secara berkelanjutan.",
 
-                "Gunakan kelompok transaksi ini sebagai acuan dalam menjaga efisiensi pelayanan."
+                "Gunakan kelompok transaksi ini sebagai acuan dalam menjaga efisiensi operasional tanpa mengurangi kualitas pelayanan."
 
             ]
 
