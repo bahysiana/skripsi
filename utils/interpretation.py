@@ -45,15 +45,13 @@ def generate_interpretation(profile_df: pd.DataFrame):
 
             "Prioritaskan penanganan transaksi pada cluster ini agar pelayanan tetap optimal.",
 
-            "Pastikan stok bahan baku selalu tersedia untuk menu yang sering dipesan.",
+            "Pastikan ketersediaan bahan baku untuk memenuhi kebutuhan transaksi dengan beban pelayanan tinggi.",
 
-            "Atur pembagian tugas karyawan ketika volume pesanan meningkat.",
+            "Atur pembagian tugas karyawan secara efektif agar proses pelayanan dapat dilakukan secara lebih optimal.",
 
-            "Lakukan persiapan awal (preparation) pada menu yang paling sering dipesan.",
+            "Lakukan pemantauan terhadap waktu persiapan pesanan untuk menjaga ketepatan pelayanan kepada pelanggan.",
 
-            "Evaluasi waktu persiapan agar tetap sesuai estimasi Shopee Food.",
-
-            "Gunakan hasil cluster ini sebagai dasar penyusunan strategi operasional toko."
+            "Gunakan hasil analisis cluster sebagai dasar dalam penyusunan strategi operasional dan peningkatan kualitas pelayanan."
 
         ]
 
