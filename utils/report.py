@@ -192,8 +192,29 @@ def export_pdf(
             styles["subtitle"]
         )
     )
+    # ==========================================================
+    # GARIS PEMISAH
+    # ==========================================================
 
-    story.append(Spacer(1, 0.8 * cm))
+    garis = Table(
+        [[""]],
+        colWidths=[16.3 * cm]
+    )
+
+    garis.setStyle(
+        TableStyle([
+            ("LINEBELOW", (0, 0), (-1, 0), 2, colors.black),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ])
+    )
+
+    story.append(garis)
+
+    story.append(
+        Spacer(1, 0.35 * cm)
+    )
+
 
     # ==========================================================
     # RINGKASAN
