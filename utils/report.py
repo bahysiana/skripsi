@@ -215,7 +215,7 @@ def export_pdf(
     normal_pct
 
 ):
-        output = BytesIO()
+    output = BytesIO()
 
     doc = SimpleDocTemplate(
 
