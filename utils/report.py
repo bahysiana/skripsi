@@ -1,15 +1,9 @@
 import pandas as pd
-
 from io import BytesIO
 
 from reportlab.lib import colors
-from reportlab.lib.enums import (
-    TA_CENTER,
-    TA_JUSTIFY,
-)
-
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.styles import ParagraphStyle
-
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
 
@@ -19,36 +13,8 @@ from reportlab.platypus import (
     Spacer,
     Table,
     TableStyle,
-    PageBreak
+    PageBreak,
 )
-
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-
-
-# ==========================================================
-# REGISTER FONT
-# ==========================================================
-
-try:
-
-    pdfmetrics.registerFont(
-        TTFont(
-            "Times",
-            "C:/Windows/Fonts/times.ttf"
-        )
-    )
-
-    pdfmetrics.registerFont(
-        TTFont(
-            "Times-Bold",
-            "C:/Windows/Fonts/timesbd.ttf"
-        )
-    )
-
-except:
-    pass
-
 
 # ==========================================================
 # EXPORT CSV
@@ -56,9 +22,7 @@ except:
 
 def export_csv(df: pd.DataFrame):
 
-    return df.to_csv(
-        index=False
-    ).encode("utf-8")
+    return df.to_csv(index=False).encode("utf-8")
 
 
 # ==========================================================
@@ -94,72 +58,43 @@ def get_styles():
     return {
 
         "title": ParagraphStyle(
-
             name="Title",
-
-            fontName="Times-Bold",
-
+            fontName="Helvetica-Bold",
             fontSize=18,
-
             alignment=TA_CENTER,
-
-            spaceAfter=12
-
+            spaceAfter=14,
         ),
 
         "subtitle": ParagraphStyle(
-
             name="Subtitle",
-
-            fontName="Times-Bold",
-
-            fontSize=13,
-
+            fontName="Helvetica-Bold",
+            fontSize=12,
             alignment=TA_CENTER,
-
-            spaceAfter=20
-
+            spaceAfter=20,
         ),
 
         "heading": ParagraphStyle(
-
             name="Heading",
-
-            fontName="Times-Bold",
-
+            fontName="Helvetica-Bold",
             fontSize=12,
-
             spaceBefore=10,
-
-            spaceAfter=8
-
+            spaceAfter=8,
         ),
 
         "normal": ParagraphStyle(
-
             name="Normal",
-
-            fontName="Times",
-
-            fontSize=11,
-
+            fontName="Helvetica",
+            fontSize=10,
             alignment=TA_JUSTIFY,
-
-            leading=20
-
+            leading=18,
         ),
 
         "table": ParagraphStyle(
-
             name="Table",
-
-            fontName="Times",
-
-            fontSize=10,
-
-            leading=14
-
-        )
+            fontName="Helvetica",
+            fontSize=9,
+            leading=12,
+        ),
 
     }
 
@@ -173,8 +108,8 @@ def add_page_number(canvas, doc):
     canvas.saveState()
 
     canvas.setFont(
-        "Times",
-        10
+        "Helvetica",
+        9
     )
 
     canvas.drawString(
@@ -212,9 +147,10 @@ def export_pdf(
 
     tinggi_pct,
 
-    normal_pct
+    normal_pct,
 
 ):
+
     output = BytesIO()
 
     doc = SimpleDocTemplate(
@@ -223,81 +159,53 @@ def export_pdf(
 
         pagesize=A4,
 
-        leftMargin=2.5 * cm,
+        leftMargin=2.2 * cm,
 
-        rightMargin=2.5 * cm,
+        rightMargin=2.2 * cm,
 
         topMargin=2.5 * cm,
 
-        bottomMargin=2.5 * cm
+        bottomMargin=2.2 * cm,
 
     )
 
     styles = get_styles()
 
     story = []
-
-    # ==========================================================
+        # ==========================================================
     # HALAMAN 1
     # ==========================================================
 
     story.append(
-
         Paragraph(
-
             "LAPORAN HASIL ANALISIS",
-
             styles["title"]
-
         )
-
     )
 
     story.append(
-
         Paragraph(
-
-            "Analisis Pola Transaksi Shopee Food Menggunakan<br/>"
-
-            "Metode K-Means Clustering Berdasarkan Data Pemesanan<br/>"
-
+            "Analisis Pola Transaksi Shopee Food Menggunakan "
+            "Metode K-Means Clustering Berdasarkan Data Pemesanan "
             "pada Toko Buffet The Padang Pasir",
-
             styles["subtitle"]
-
         )
-
     )
 
-    story.append(
-
-        Spacer(
-
-            1,
-
-            0.8 * cm
-
-        )
-
-    )
+    story.append(Spacer(1, 0.8 * cm))
 
     # ==========================================================
-    # RINGKASAN HASIL ANALISIS
+    # RINGKASAN
     # ==========================================================
 
     story.append(
-
         Paragraph(
-
             "Ringkasan Hasil Analisis",
-
             styles["heading"]
-
         )
-
     )
 
-    summary_table = [
+    data_ringkasan = [
 
         [
 
@@ -307,91 +215,65 @@ def export_pdf(
 
             Paragraph("<b>Persentase (%)</b>", styles["table"])
 
+        ],
+
+        [
+
+            Paragraph(
+                "Pola Transaksi dengan Beban Pelayanan Tinggi",
+                styles["table"]
+            ),
+
+            Paragraph(
+                str(tinggi),
+                styles["table"]
+            ),
+
+            Paragraph(
+                f"{tinggi_pct:.2f}",
+                styles["table"]
+            )
+
+        ],
+
+        [
+
+            Paragraph(
+                "Pola Transaksi dengan Beban Pelayanan Rendah",
+                styles["table"]
+            ),
+
+            Paragraph(
+                str(normal),
+                styles["table"]
+            ),
+
+            Paragraph(
+                f"{normal_pct:.2f}",
+                styles["table"]
+            )
+
         ]
 
     ]
 
-    summary_table.append(
+    tabel_ringkasan = Table(
 
-        [
-
-            Paragraph(
-
-                "Pola Transaksi dengan Beban Pelayanan Tinggi",
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                str(tinggi),
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                f"{tinggi_pct:.2f}",
-
-                styles["table"]
-
-            )
-
-        ]
-
-    )
-
-    summary_table.append(
-
-        [
-
-            Paragraph(
-
-                "Pola Transaksi dengan Beban Pelayanan Rendah",
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                str(normal),
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                f"{normal_pct:.2f}",
-
-                styles["table"]
-
-            )
-
-        ]
-
-    )
-
-    table = Table(
-
-        summary_table,
+        data_ringkasan,
 
         colWidths=[10 * cm, 2.5 * cm, 3 * cm]
 
     )
 
-    table.setStyle(
+    tabel_ringkasan.setStyle(
 
         TableStyle([
 
             ("GRID", (0, 0), (-1, -1), 1, colors.black),
 
-            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAEAEA")),
 
-            ("FONTNAME", (0, 0), (-1, 0), "Times-Bold"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
 
             ("ALIGN", (1, 1), (-1, -1), "CENTER"),
 
@@ -399,29 +281,15 @@ def export_pdf(
 
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
 
-            ("TOPPADDING", (0, 0), (-1, -1), 8)
+            ("TOPPADDING", (0, 0), (-1, -1), 8),
 
         ])
 
     )
 
-    story.append(
+    story.append(tabel_ringkasan)
 
-        table
-
-    )
-
-    story.append(
-
-        Spacer(
-
-            1,
-
-            0.8 * cm
-
-        )
-
-    )
+    story.append(Spacer(1, 0.8 * cm))
 
     # ==========================================================
     # KESIMPULAN
@@ -431,7 +299,7 @@ def export_pdf(
 
         Paragraph(
 
-            "Kesimpulan Singkat",
+            "Kesimpulan",
 
             styles["heading"]
 
@@ -444,31 +312,24 @@ def export_pdf(
         Paragraph(
 
             f"""
+            Berdasarkan hasil analisis terhadap <b>{total_data}</b> data
+            transaksi Shopee Food menggunakan metode K-Means Clustering,
+            diperoleh dua kelompok transaksi.
 
-            Berdasarkan hasil analisis terhadap <b>{total_data}</b> data transaksi
-
-            Shopee Food, diperoleh dua kelompok transaksi yaitu
-
+            Kelompok pertama yaitu
             <b>Pola Transaksi dengan Beban Pelayanan Tinggi</b>
-
             sebanyak <b>{tinggi}</b> transaksi
+            (<b>{tinggi_pct:.2f}%</b>).
 
-            (<b>{tinggi_pct:.2f}%</b>)
-
-            dan
-
+            Kelompok kedua yaitu
             <b>Pola Transaksi dengan Beban Pelayanan Rendah</b>
-
             sebanyak <b>{normal}</b> transaksi
-
             (<b>{normal_pct:.2f}%</b>).
 
-            Hasil pengelompokan ini dapat digunakan sebagai dasar dalam
-
-            mendukung pengambilan keputusan operasional pada
-
-            Buffet The Padang Pasir.
-
+            Hasil pengelompokan ini dapat dijadikan sebagai dasar
+            dalam mendukung pengambilan keputusan operasional,
+            pembagian sumber daya, serta peningkatan kualitas
+            pelayanan pada Buffet The Padang Pasir.
             """,
 
             styles["normal"]
@@ -477,16 +338,12 @@ def export_pdf(
 
     )
 
-    # ==========================================================
-    # HALAMAN BARU
-    # ==========================================================
-
     story.append(
 
         PageBreak()
 
     )
-    # ==========================================================
+        # ==========================================================
     # HALAMAN 2
     # ==========================================================
 
@@ -504,55 +361,36 @@ def export_pdf(
 
     story.append(
 
-        Spacer(
+        Spacer(1, 0.5 * cm)
 
-            1,
+    )
 
-            0.5 * cm
+    story.append(
+
+        Paragraph(
+
+            "Interpretasi hasil clustering digunakan untuk memberikan "
+            "gambaran karakteristik dari setiap kelompok transaksi "
+            "beserta rekomendasi yang dapat dijadikan dasar dalam "
+            "pengambilan keputusan operasional.",
+
+            styles["normal"]
 
         )
 
     )
 
-    # ==========================================================
-    # DATA INTERPRETASI
-    # ==========================================================
+    story.append(
 
-    karakteristik_tinggi = """
-    • Nilai transaksi relatif lebih tinggi.<br/>
-    • Jumlah pesanan lebih banyak.<br/>
-    • Variasi menu lebih beragam.<br/>
-    • Waktu persiapan relatif lebih lama.
-    """
+        Spacer(1, 0.5 * cm)
 
-    rekomendasi_tinggi = """
-    • Prioritaskan penanganan transaksi.<br/>
-    • Pastikan ketersediaan bahan baku.<br/>
-    • Atur pembagian tugas karyawan.<br/>
-    • Pantau waktu persiapan pesanan.<br/>
-    • Gunakan hasil analisis sebagai dasar strategi operasional.
-    """
-
-    karakteristik_rendah = """
-    • Nilai transaksi relatif lebih rendah.<br/>
-    • Jumlah pesanan lebih sedikit.<br/>
-    • Variasi menu lebih sederhana.<br/>
-    • Waktu persiapan relatif lebih singkat.
-    """
-
-    rekomendasi_rendah = """
-    • Pertahankan kualitas pelayanan.<br/>
-    • Jalankan prosedur operasional.<br/>
-    • Kelola sumber daya secara optimal.<br/>
-    • Lakukan evaluasi berkala.<br/>
-    • Jaga efisiensi operasional.
-    """
+    )
 
     # ==========================================================
     # TABEL INTERPRETASI
     # ==========================================================
 
-    interpretasi_table = [
+    data_interpretasi = [
 
         [
 
@@ -576,7 +414,12 @@ def export_pdf(
 
             Paragraph(
 
-                karakteristik_tinggi,
+                """
+                • Nilai transaksi relatif tinggi.<br/>
+                • Jumlah pesanan lebih banyak.<br/>
+                • Variasi menu lebih beragam.<br/>
+                • Waktu persiapan relatif lebih lama.
+                """,
 
                 styles["table"]
 
@@ -584,7 +427,13 @@ def export_pdf(
 
             Paragraph(
 
-                rekomendasi_tinggi,
+                """
+                • Prioritaskan pelayanan transaksi.<br/>
+                • Pastikan stok bahan baku tersedia.<br/>
+                • Atur pembagian tugas karyawan.<br/>
+                • Pantau waktu persiapan pesanan.<br/>
+                • Jadikan cluster ini sebagai prioritas operasional.
+                """,
 
                 styles["table"]
 
@@ -604,7 +453,12 @@ def export_pdf(
 
             Paragraph(
 
-                karakteristik_rendah,
+                """
+                • Nilai transaksi relatif rendah.<br/>
+                • Jumlah pesanan lebih sedikit.<br/>
+                • Variasi menu lebih sederhana.<br/>
+                • Waktu persiapan relatif singkat.
+                """,
 
                 styles["table"]
 
@@ -612,7 +466,13 @@ def export_pdf(
 
             Paragraph(
 
-                rekomendasi_rendah,
+                """
+                • Pertahankan kualitas pelayanan.<br/>
+                • Kelola sumber daya secara efisien.<br/>
+                • Lakukan evaluasi berkala.<br/>
+                • Pertahankan standar operasional.<br/>
+                • Tetap menjaga kepuasan pelanggan.
+                """,
 
                 styles["table"]
 
@@ -622,23 +482,23 @@ def export_pdf(
 
     ]
 
-    interpretasi = Table(
+    tabel_interpretasi = Table(
 
-        interpretasi_table,
+        data_interpretasi,
 
-        colWidths=[5 * cm, 5.5 * cm, 6 * cm]
+        colWidths=[5 * cm, 6 * cm, 6 * cm]
 
     )
 
-    interpretasi.setStyle(
+    tabel_interpretasi.setStyle(
 
         TableStyle([
 
             ("GRID", (0, 0), (-1, -1), 1, colors.black),
 
-            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAEAEA")),
 
-            ("FONTNAME", (0, 0), (-1, 0), "Times-Bold"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
 
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
 
@@ -650,7 +510,7 @@ def export_pdf(
 
             ("LEFTPADDING", (0, 0), (-1, -1), 6),
 
-            ("RIGHTPADDING", (0, 0), (-1, -1), 6)
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
 
         ])
 
@@ -658,31 +518,25 @@ def export_pdf(
 
     story.append(
 
-        interpretasi
+        tabel_interpretasi
 
     )
 
     story.append(
 
-        Spacer(
-
-            1,
-
-            0.7 * cm
-
-        )
+        Spacer(1, 0.7 * cm)
 
     )
 
     # ==========================================================
-    # PENJELASAN
+    # PENUTUP
     # ==========================================================
 
     story.append(
 
         Paragraph(
 
-            "Keterangan",
+            "Penutup",
 
             styles["heading"]
 
@@ -695,10 +549,13 @@ def export_pdf(
         Paragraph(
 
             """
-            Interpretasi hasil clustering memberikan gambaran mengenai
-            karakteristik masing-masing kelompok transaksi beserta rekomendasi
-            yang dapat digunakan sebagai bahan pertimbangan dalam mendukung
-            pengambilan keputusan operasional pada Buffet The Padang Pasir.
+            Hasil analisis clustering ini diharapkan dapat membantu
+            Buffet The Padang Pasir dalam memahami pola transaksi
+            pelanggan sehingga dapat digunakan sebagai dasar dalam
+            menentukan prioritas pelayanan, pengelolaan stok bahan baku,
+            pembagian sumber daya, serta meningkatkan efektivitas
+            operasional berdasarkan karakteristik transaksi yang
+            telah terbentuk.
             """,
 
             styles["normal"]
@@ -706,8 +563,9 @@ def export_pdf(
         )
 
     )
+
     # ==========================================================
-    # MEMBANGUN DOKUMEN PDF
+    # MEMBANGUN PDF
     # ==========================================================
 
     doc.build(
