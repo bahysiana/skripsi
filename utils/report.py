@@ -60,17 +60,18 @@ def get_styles():
         "title": ParagraphStyle(
             name="Title",
             fontName="Helvetica-Bold",
-            fontSize=18,
+            fontSize=14,
             alignment=TA_CENTER,
-            spaceAfter=14,
+            spaceAfter=8,
         ),
 
         "subtitle": ParagraphStyle(
             name="Subtitle",
             fontName="Helvetica-Bold",
-            fontSize=12,
+            fontSize=11,
             alignment=TA_CENTER,
-            spaceAfter=20,
+            spaceAfter=10,
+            leading=15,
         ),
 
         "heading": ParagraphStyle(
