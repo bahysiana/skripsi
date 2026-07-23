@@ -563,17 +563,6 @@ persiapan yang relatif lebih rendah.
 
                 st.markdown(f"• {item}")
 
-    st.divider()
-    # ======================================================
-    # DATA HASIL CLUSTERING
-    # ======================================================
-
-    st.subheader("📋 Data Hasil Clustering")
-
-    st.markdown("""
-    Tabel berikut menampilkan hasil pengelompokan setiap transaksi
-    berdasarkan proses K-Means Clustering.
-    """)
 
     # ======================================================
     # DATA HASIL CLUSTERING
