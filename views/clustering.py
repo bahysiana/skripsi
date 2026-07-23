@@ -595,6 +595,8 @@ persiapan yang relatif lebih rendah.
     hasil_cluster["Cluster"].map(cluster_mapping)
     )
 
+    st.write(hasil_cluster.columns.tolist())
+
     # ======================================================
     # Ubah nama kolom agar lebih rapi
     # ======================================================
@@ -619,6 +621,23 @@ persiapan yang relatif lebih rendah.
             "Hasil Clustering"
 
     })
+    kolom_tampil = [
+
+            "Username",
+
+            "Total Harga",
+
+            "Jumlah Pesanan",
+
+            "Jumlah Jenis Menu",
+
+            "Waktu Persiapan Diberikan",
+
+            "Waktu Persiapan Digunakan",
+
+            "Hasil Clustering"
+
+    ]
 
 hasil_cluster = hasil_cluster[kolom_tampil]
 
