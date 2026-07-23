@@ -565,8 +565,8 @@ persiapan yang relatif lebih rendah.
 
     st.divider()
     # ======================================================
-# DATA HASIL CLUSTERING
-# ======================================================
+    # DATA HASIL CLUSTERING
+    # ======================================================
 
     st.subheader("📋 Data Hasil Clustering")
 
@@ -576,11 +576,15 @@ persiapan yang relatif lebih rendah.
     """)
 
     # Salin dataframe hasil clustering
-    hasil_cluster = result_df.copy()
+    # ================================
+    # DATA HASIL CLUSTERING
+    # ================================
 
-    # ======================================================
-    # Mapping nama cluster
-    # ======================================================
+    # Mengambil data asli hasil preprocessing
+    hasil_cluster = st.session_state["original_df"].copy()
+
+    # Menambahkan label cluster
+    hasil_cluster["Cluster"] = result_df["Cluster"]
 
     cluster_mapping = {
         0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
@@ -588,33 +592,11 @@ persiapan yang relatif lebih rendah.
     }
 
     hasil_cluster["Hasil Clustering"] = (
-        hasil_cluster["Cluster"]
-        .map(cluster_mapping)
+    hasil_cluster["Cluster"].map(cluster_mapping)
     )
 
-    # ======================================================
-    # Pilih kolom yang ditampilkan
-    # ======================================================
-
-    kolom_tampil = [
-
-        "username",
-
-        "Total_harga",
-
-        "Jumlah_pesanan",
-
-        "Jumlah_jenis_menu",
-
-        "waktu_persiapan_yang_diberikan",
-
-        "waktu_persiapan_digunakan",
-
-        "Hasil Clustering"
-
-    ]
-
-    hasil_cluster = hasil_cluster[kolom_tampil]
+    # DEBUG
+    st.write(hasil_cluster.columns.tolist())
 
     # ======================================================
     # Ubah nama kolom agar lebih rapi
