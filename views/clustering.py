@@ -598,7 +598,7 @@ persiapan yang relatif lebih rendah.
 
     kolom_tampil = [
 
-        "Username",
+        "username",
 
         "Total_harga",
 
@@ -622,7 +622,7 @@ persiapan yang relatif lebih rendah.
 
     hasil_cluster = hasil_cluster.rename(columns={
 
-        "Username": "Username",
+        "username": "Username",
 
         "Total_harga": "Total Harga",
 
