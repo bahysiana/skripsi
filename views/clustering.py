@@ -619,23 +619,6 @@ persiapan yang relatif lebih rendah.
             "Hasil Clustering"
 
     })
-        kolom_tampil = [
-
-            "Username",
-
-            "Total Harga",
-
-            "Jumlah Pesanan",
-
-            "Jumlah Jenis Menu",
-
-            "Waktu Persiapan Diberikan",
-
-            "Waktu Persiapan Digunakan",
-
-            "Hasil Clustering"
-
-        ]
 
 hasil_cluster = hasil_cluster[kolom_tampil]
 
