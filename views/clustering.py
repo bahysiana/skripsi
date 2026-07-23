@@ -564,6 +564,98 @@ persiapan yang relatif lebih rendah.
                 st.markdown(f"• {item}")
 
     st.divider()
+    # ======================================================
+# DATA HASIL CLUSTERING
+# ======================================================
+
+    st.subheader("📋 Data Hasil Clustering")
+
+    st.markdown("""
+    Tabel berikut menampilkan hasil pengelompokan setiap transaksi
+    berdasarkan proses K-Means Clustering.
+    """)
+
+    # Salin dataframe hasil clustering
+    hasil_cluster = result_df.copy()
+
+    # ======================================================
+    # Mapping nama cluster
+    # ======================================================
+
+    cluster_mapping = {
+        0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
+        1: "Pola Transaksi dengan Beban Pelayanan Rendah"
+    }
+
+    hasil_cluster["Hasil Clustering"] = (
+        hasil_cluster["Cluster"]
+        .map(cluster_mapping)
+    )
+
+    # ======================================================
+    # Pilih kolom yang ditampilkan
+    # ======================================================
+
+    kolom_tampil = [
+
+        "Username",
+
+        "Total_harga",
+
+        "Jumlah_pesanan",
+
+        "Jumlah_jenis_menu",
+
+        "waktu_persiapan_yang_diberikan",
+
+        "waktu_persiapan_digunakan",
+
+        "Hasil Clustering"
+
+    ]
+
+    hasil_cluster = hasil_cluster[kolom_tampil]
+
+    # ======================================================
+    # Ubah nama kolom agar lebih rapi
+    # ======================================================
+
+    hasil_cluster = hasil_cluster.rename(columns={
+
+        "Username": "Username",
+
+        "Total_harga": "Total Harga",
+
+        "Jumlah_pesanan": "Jumlah Pesanan",
+
+        "Jumlah_jenis_menu": "Jumlah Jenis Menu",
+
+        "waktu_persiapan_yang_diberikan":
+        "Waktu Persiapan Diberikan",
+
+        "waktu_persiapan_digunakan":
+        "Waktu Persiapan Digunakan",
+
+        "Hasil Clustering":
+            "Hasil Clustering"
+
+    })
+
+    st.dataframe(
+
+        hasil_cluster,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.caption(
+        f"Menampilkan {len(hasil_cluster)} transaksi hasil pengelompokan menggunakan metode K-Means Clustering."
+    )
+
+    st.divider()
         # ======================================================
     # PROFIL CLUSTER
     # ======================================================
@@ -572,8 +664,8 @@ persiapan yang relatif lebih rendah.
 
     st.markdown(
         """
-Tabel berikut menunjukkan rata-rata nilai setiap variabel
-pada masing-masing cluster hasil proses K-Means Clustering.
+    Tabel berikut menunjukkan rata-rata nilai setiap variabel
+    pada masing-masing cluster hasil proses K-Means Clustering.
         """
     )
 
