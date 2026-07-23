@@ -594,17 +594,6 @@ persiapan yang relatif lebih rendah.
     hasil_cluster["Hasil Clustering"] = (
     hasil_cluster["Cluster"].map(cluster_mapping)
     )
-    kolom_tampil = [
-        "username",
-        "Total_harga",
-        "Jumlah_pesanan",
-        "Jumlah_jenis_menu",
-        "waktu_persiapan_yang_diberikan",
-        "waktu_persiapan_digunakan",
-        "Hasil Clustering"
-    ]
-
-hasil_cluster = hasil_cluster[kolom_tampil]
 
     # DEBUG
     st.write(hasil_cluster.columns.tolist())
