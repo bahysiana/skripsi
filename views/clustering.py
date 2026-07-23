@@ -575,15 +575,19 @@ persiapan yang relatif lebih rendah.
     berdasarkan proses K-Means Clustering.
     """)
 
-    # Salin dataframe hasil clustering
-    # ================================
+    # ======================================================
     # DATA HASIL CLUSTERING
-    # ================================
+    # ======================================================
 
-    # Mengambil data asli hasil preprocessing
+    st.subheader("📋 Data Hasil Clustering")
+
+    st.markdown("""
+    Tabel berikut menampilkan hasil pengelompokan setiap transaksi
+    berdasarkan proses K-Means Clustering.
+    """)
+
     hasil_cluster = st.session_state["original_df"].copy()
 
-    # Menambahkan label cluster
     hasil_cluster["Cluster"] = result_df["Cluster"]
 
     cluster_mapping = {
@@ -592,63 +596,34 @@ persiapan yang relatif lebih rendah.
     }
 
     hasil_cluster["Hasil Clustering"] = (
-    hasil_cluster["Cluster"].map(cluster_mapping)
+        hasil_cluster["Cluster"].map(cluster_mapping)
     )
 
-    st.write(hasil_cluster.columns.tolist())
-
-    # ======================================================
-    # Ubah nama kolom agar lebih rapi
-    # ======================================================
-
     hasil_cluster = hasil_cluster.rename(columns={
-
         "username": "Username",
-
         "Total_harga": "Total Harga",
-
         "Jumlah_pesanan": "Jumlah Pesanan",
-
         "Jumlah_jenis_menu": "Jumlah Jenis Menu",
-
-        "waktu_persiapan_yang_diberikan":
-            "Waktu Persiapan Diberikan",
-
-        "waktu_persiapan_digunakan":
-            "Waktu Persiapan Digunakan",
-
-        "Hasil Clustering":
-            "Hasil Clustering"
-
+        "waktu_persiapan_yang_diberikan": "Waktu Persiapan Diberikan",
+        "waktu_persiapan_digunakan": "Waktu Persiapan Digunakan"
     })
+
     kolom_tampil = [
-
-            "Username",
-
-            "Total Harga",
-
-            "Jumlah Pesanan",
-
-            "Jumlah Jenis Menu",
-
-            "Waktu Persiapan Diberikan",
-
-            "Waktu Persiapan Digunakan",
-
-            "Hasil Clustering"
-
+        "Username",
+        "Total Harga",
+        "Jumlah Pesanan",
+        "Jumlah Jenis Menu",
+        "Waktu Persiapan Diberikan",
+        "Waktu Persiapan Digunakan",
+        "Hasil Clustering"
     ]
 
-hasil_cluster = hasil_cluster[kolom_tampil]
+    hasil_cluster = hasil_cluster[kolom_tampil]
 
     st.dataframe(
-
         hasil_cluster,
-
         hide_index=True,
-
         use_container_width=True
-
     )
 
     st.caption(
@@ -656,7 +631,8 @@ hasil_cluster = hasil_cluster[kolom_tampil]
     )
 
     st.divider()
-        # ======================================================
+
+    # ======================================================
     # PROFIL CLUSTER
     # ======================================================
 
