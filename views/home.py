@@ -66,13 +66,14 @@ def show_home():
 
     st.info(
         """
-Penelitian ini bertujuan untuk menganalisis pola transaksi pelanggan
-Shopee Food pada Toko Buffet The Padang Pasir menggunakan algoritma
-K-Means Clustering.
+Sistem ini dirancang untuk membantu Buffet The Padang Pasir dalam
+menganalisis pola transaksi pemesanan melalui Shopee Food menggunakan
+metode K-Means Clustering.
 
-Hasil clustering diharapkan mampu membantu pemilik toko
-dalam memahami karakteristik transaksi pelanggan sehingga
-dapat dijadikan dasar dalam pengambilan keputusan bisnis.
+Hasil analisis digunakan untuk mengelompokkan produk berdasarkan
+karakteristik transaksi sehingga dapat membantu pemilik usaha dalam
+menentukan prioritas pelayanan, pengelolaan stok bahan baku, serta
+mendukung pengambilan keputusan operasional.
 """
     )
 
@@ -93,7 +94,7 @@ dapat dijadikan dasar dalam pengambilan keputusan bisnis.
     else:
 
         st.success(
-            f"Dataset tersedia sebanyak **{total_data}** data transaksi."
+            f"Sebanyak **{total_data}** data transaksi Shopee Food telah tersedia dan siap untuk dianalisis."
         )
 
     st.divider()
@@ -105,9 +106,9 @@ dapat dijadikan dasar dalam pengambilan keputusan bisnis.
     st.subheader("🚀 Alur Penggunaan")
 
     st.markdown("""
-1. Upload dataset pada menu **Kelola Data**.
-2. Lakukan **Preprocessing** (Cleaning, Feature Engineering, Min-Max).
-3. Jalankan proses **K-Means Clustering**.
-4. Lihat hasil analisis dan interpretasi cluster.
-5. Download hasil penelitian.
+1. Tambahkan atau upload data transaksi Shopee Food pada menu **Kelola Data**.
+2. Jalankan proses **Preprocessing** untuk menyiapkan data.
+3. Lakukan proses **K-Means Clustering** untuk mengelompokkan produk.
+4. Lihat hasil analisis, karakteristik, dan rekomendasi setiap cluster.
+5. Unduh hasil analisis apabila diperlukan.
 """)
