@@ -15,7 +15,7 @@ DATABASE_DIR.mkdir(
 
 DATABASE_PATH = DATABASE_DIR / "shopee_food.db"
 
-TABLE_NAME = "transaksi"
+TABLE_NAME = "dataset_produk"
 
 
 # ==========================================================
