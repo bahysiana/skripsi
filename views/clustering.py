@@ -1,660 +1,420 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
 
-from utils.clustering import (
-    perform_clustering,
-    cluster_summary,
-    cluster_profile
+from utils.database import (
+    get_all_data,
+    is_database_empty
+)
+
+from utils.preprocessing import (
+    preprocess_dataset,
+    FEATURE_COLUMNS
 )
 
 
 # ==========================================================
-# HALAMAN CLUSTERING
+# HALAMAN PREPROCESSING
 # ==========================================================
 
-def show_clustering():
+def show_preprocessing():
 
     # ======================================================
     # HEADER
     # ======================================================
 
-    st.title("📊 Hasil Clustering")
+    st.title("🧹 Preprocessing")
 
     st.caption(
         """
-Analisis pola transaksi Shopee Food menggunakan
-metode K-Means Clustering.
+Melakukan proses Data Cleaning,
+Agregasi Produk, Feature Selection,
+dan Min-Max Normalization
+sebelum proses K-Means Clustering.
         """
     )
 
     st.divider()
 
     # ======================================================
-    # CEK PREPROCESSING
+    # CEK DATABASE
     # ======================================================
 
-    if "normalized_df" not in st.session_state:
+    if is_database_empty():
 
         st.warning(
             """
-Silakan lakukan **Preprocessing**
-terlebih dahulu sebelum menjalankan
-proses clustering.
+Belum ada dataset pada database.
+
+Silakan upload dataset terlebih dahulu
+melalui menu **Kelola Data**.
             """
         )
 
         return
 
-    normalized_df = st.session_state["normalized_df"]
-
     # ======================================================
-    # SESSION
+    # LOAD DATASET
     # ======================================================
 
-    if "cluster_df" not in st.session_state:
-
-        st.session_state["cluster_df"] = None
-
-    if "centroid_df" not in st.session_state:
-
-        st.session_state["centroid_df"] = None
+    df = get_all_data()
 
     # ======================================================
-    # INFORMASI
+    # INFORMASI PREPROCESSING
     # ======================================================
 
     st.info(
         """
-Klik tombol **Jalankan Clustering**
-untuk melakukan proses pengelompokan
-data transaksi menggunakan metode
+Tahapan preprocessing yang dilakukan:
+
+1. Data Cleaning
+
+2. Agregasi Produk
+
+3. Feature Selection
+
+4. Min-Max Normalization
+
+Dataset hasil preprocessing
+akan digunakan pada proses
 K-Means Clustering.
         """
     )
 
+    st.divider()
+
     # ======================================================
-    # BUTTON
+    # DATASET AWAL
     # ======================================================
 
-    col_btn, col_info = st.columns([1, 5])
+    st.subheader("📂 Dataset Awal")
 
-    with col_btn:
+    col1, col2 = st.columns(2)
 
-        mulai = st.button(
-            "🚀 Jalankan",
-            type="primary",
-            use_container_width=True
+    with col1:
+
+        st.metric(
+
+            "Jumlah Transaksi",
+
+            len(df)
+
         )
 
-    with col_info:
+    with col2:
 
-        st.empty()
+        st.metric(
 
-    # ======================================================
-    # PROSES CLUSTERING
-    # ======================================================
+            "Jumlah Kolom",
 
-    if mulai:
+            len(df.columns)
 
-        with st.spinner(
-            "Sedang melakukan proses clustering..."
-        ):
-
-            result_df, centroid_df = perform_clustering(
-                normalized_df,
-                n_clusters=2
-            )
-
-        st.session_state["cluster_df"] = result_df
-        st.session_state["centroid_df"] = centroid_df
-
-        st.success(
-            "Proses clustering berhasil dilakukan."
         )
 
+    st.dataframe(
+
+        df,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
     # ======================================================
-    # CEK HASIL
+    # TOMBOL PREPROCESSING
     # ======================================================
 
-    if st.session_state["cluster_df"] is None:
+    mulai = st.button(
+
+        "▶ Mulai Preprocessing",
+
+        type="primary",
+
+        use_container_width=True
+
+    )
+
+    if not mulai:
 
         return
 
-    result_df = st.session_state["cluster_df"]
-
-    centroid_df = st.session_state["centroid_df"]
-
     # ======================================================
-    # RINGKASAN
+    # PROSES PREPROCESSING
     # ======================================================
 
-    summary = cluster_summary(result_df)
+    with st.spinner("Sedang melakukan preprocessing data..."):
 
-    total_data = len(result_df)
+        (
+            cleaned_df,
+            product_dataset,
+            feature_df,
+            normalized_df,
+            scaler
+        ) = preprocess_dataset(df)
 
-    tinggi = int(summary.iloc[0]["Jumlah"])
-
-    normal = int(summary.iloc[1]["Jumlah"])
-
-    tinggi_pct = float(summary.iloc[0]["Persentase"])
-
-    normal_pct = float(summary.iloc[1]["Persentase"])
+    st.success(
+        "Preprocessing berhasil dilakukan."
+    )
 
     st.divider()
 
     # ======================================================
-    # KPI
+    # HASIL DATA CLEANING
     # ======================================================
 
-    st.subheader("📌 Ringkasan Hasil Clustering")
+    st.subheader("🧹 Hasil Data Cleaning")
 
-    k1, k2, k3, k4 = st.columns(4)
+    col1, col2 = st.columns(2)
 
-    with k1:
-
-        st.metric(
-            "📦 Total Transaksi",
-            total_data
-        )
-
-    with k2:
+    with col1:
 
         st.metric(
-            "🟧 Beban Pelayanan Tinggi",
-            tinggi,
-            f"{tinggi_pct:.2f}%"
+            "Jumlah Data",
+            len(cleaned_df)
         )
 
-    with k3:
+    with col2:
 
         st.metric(
-            "🟩 Beban Pelayanan Rendah",
-            normal,
-            f"{normal_pct:.2f}%"
+            "Jumlah Kolom",
+            len(cleaned_df.columns)
         )
-
-    with k4:
-
-        st.metric(
-            "🧠 Jumlah Cluster",
-            "2"
-        )
-
-    st.divider()
-        # ======================================================
-    # RINGKASAN ANALISIS
-    # ======================================================
-
-    st.subheader("📖 Ringkasan Analisis")
 
     st.markdown(
-        f"""
-Berdasarkan proses **K-Means Clustering** terhadap
-**{total_data} transaksi**, diperoleh hasil sebagai berikut.
-
-- **{tinggi} transaksi ({tinggi_pct:.2f}%)**
-  termasuk kelompok **Pola Transaksi dengan Beban Pelayanan Tinggi**.
-
-- **{normal} transaksi ({normal_pct:.2f}%)**
-  termasuk kelompok **Pola Transaksi dengan Beban Pelayanan Rendah**.
-
-Hasil pengelompokan ini memberikan gambaran karakteristik
-transaksi pelanggan yang dapat digunakan sebagai salah satu
-dasar dalam mendukung pengambilan keputusan operasional
-pada Buffet The Padang Pasir.
+        """
+Tahap ini bertujuan untuk membersihkan dataset
+dari data duplikat, data kosong, serta merapikan
+struktur data sehingga siap digunakan pada proses
+berikutnya.
         """
     )
 
-    st.divider()
+    st.dataframe(
 
-    # ======================================================
-    # VISUALISASI HASIL CLUSTERING
-    # ======================================================
+        cleaned_df,
 
-    st.subheader("📈 Visualisasi Hasil Clustering")
+        hide_index=True,
 
-    col_chart, col_table = st.columns([2, 1])
+        use_container_width=True
 
-    # ======================================================
-    # GRAFIK
-    # ======================================================
-
-    with col_chart:
-
-        chart_df = pd.DataFrame({
-
-            "Kategori": [
-
-                "Beban Pelayanan Tinggi",
-
-                "Beban Pelayanan Rendah"
-
-            ],
-
-            "Jumlah": [
-
-                tinggi,
-
-                normal
-
-            ]
-
-        })
-
-        fig = px.bar(
-
-            chart_df,
-
-            x="Kategori",
-
-            y="Jumlah",
-
-            text="Jumlah",
-
-            color="Kategori",
-
-            color_discrete_map={
-
-                "Beban Pelayanan Tinggi": "#F57C00",
-
-                "Beban Pelayanan Rendah": "#34A853"
-
-            }
-
-        )
-
-        fig.update_layout(
-
-            height=430,
-
-            showlegend=False,
-
-            plot_bgcolor="white",
-
-            paper_bgcolor="white",
-
-            margin=dict(
-
-                l=20,
-
-                r=20,
-
-                t=20,
-
-                b=20
-
-            )
-
-        )
-
-        fig.update_traces(
-
-            textposition="outside"
-
-        )
-
-        st.plotly_chart(
-
-            fig,
-
-            use_container_width=True
-
-        )
-
-    # ======================================================
-    # RINGKASAN
-    # ======================================================
-
-    with col_table:
-
-        st.subheader("📋 Ringkasan")
-
-        ringkasan_df = pd.DataFrame({
-
-            "Kategori": [
-
-                "Beban Pelayanan Tinggi",
-
-                "Beban Pelayanan Rendah"
-
-            ],
-
-            "Jumlah": [
-
-                tinggi,
-
-                normal
-
-            ],
-
-            "Persentase": [
-
-                f"{tinggi_pct:.2f}%",
-
-                f"{normal_pct:.2f}%"
-
-            ]
-
-        })
-
-        st.dataframe(
-
-            ringkasan_df,
-
-            hide_index=True,
-
-            use_container_width=True
-
-        )
-
-        st.markdown("### ℹ️ Informasi")
-
-        st.info(
-            """
-Grafik menunjukkan jumlah transaksi
-yang termasuk pada masing-masing
-cluster hasil K-Means Clustering.
-
-Semakin tinggi jumlah transaksi,
-semakin banyak data yang berada
-pada kelompok tersebut.
-            """
-        )
-
-    st.divider()
-
-    # ======================================================
-    # DETAIL NILAI CENTROID
-    # ======================================================
-
-    st.subheader("📐 Detail Nilai Centroid")
-
-    with st.expander("Lihat Nilai Centroid"):
-
-        st.markdown(
-            """
-Centroid merupakan titik pusat
-dari setiap cluster yang dihasilkan
-oleh algoritma K-Means.
-
-Nilai centroid digunakan sebagai
-acuan dalam menentukan karakteristik
-masing-masing cluster.
-            """
-        )
-
-        st.dataframe(
-
-            centroid_df.round(4),
-
-            hide_index=True,
-
-            use_container_width=True
-
-        )
-
-    st.divider()
-        # ======================================================
-    # INTERPRETASI
-    # ======================================================
-
-    st.subheader("🎯 Interpretasi Hasil Clustering")
-
-    left, right = st.columns(2)
-
-    # ======================================================
-    # BEBAN PELAYANAN TINGGI
-    # ======================================================
-
-    with left:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "## 🟧 Pola Transaksi dengan Beban Pelayanan Tinggi"
-            )
-
-            st.caption(
-                """
-Kelompok transaksi dengan nilai transaksi,
-jumlah pesanan, variasi menu, dan waktu
-persiapan yang relatif lebih tinggi.
-                """
-            )
-
-            st.divider()
-
-            c1, c2 = st.columns(2)
-
-            with c1:
-
-                st.metric(
-                    "Jumlah Transaksi",
-                    tinggi
-                )
-
-            with c2:
-
-                st.metric(
-                    "Persentase",
-                    f"{tinggi_pct:.2f}%"
-                )
-
-            st.divider()
-
-            st.markdown("### 📌 Karakteristik")
-
-            karakteristik_tinggi = [
-
-                "Nilai transaksi relatif lebih tinggi.",
-
-                "Jumlah pesanan lebih banyak.",
-
-                "Variasi menu lebih beragam.",
-
-                "Waktu persiapan relatif lebih lama."
-
-            ]
-
-            for item in karakteristik_tinggi:
-
-                st.markdown(f"✅ {item}")
-
-            st.divider()
-
-            st.markdown("### 💡 Rekomendasi")
-
-            rekomendasi_tinggi = [
-
-                "Prioritaskan penanganan transaksi pada kelompok ini agar proses pelayanan tetap optimal.",
-
-                "Pastikan ketersediaan bahan baku untuk memenuhi kebutuhan transaksi dengan beban pelayanan tinggi.",
-
-                "Atur pembagian tugas karyawan secara efektif agar proses pelayanan dapat dilakukan secara lebih optimal.",
-
-                "Lakukan pemantauan terhadap waktu persiapan pesanan untuk menjaga ketepatan pelayanan kepada pelanggan.",
-
-                "Gunakan hasil analisis cluster sebagai dasar dalam penyusunan strategi operasional dan peningkatan kualitas pelayanan."
-
-            ]
-
-            for item in rekomendasi_tinggi:
-
-                st.markdown(f"• {item}")
-
-    # ======================================================
-    # BEBAN PELAYANAN RENDAH
-    # ======================================================
-
-    with right:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "## 🟩 Pola Transaksi dengan Beban Pelayanan Rendah"
-            )
-
-            st.caption(
-                """
-Kelompok transaksi dengan nilai transaksi,
-jumlah pesanan, variasi menu, dan waktu
-persiapan yang relatif lebih rendah.
-                """
-            )
-
-            st.divider()
-
-            c1, c2 = st.columns(2)
-
-            with c1:
-
-                st.metric(
-                    "Jumlah Transaksi",
-                    normal
-                )
-
-            with c2:
-
-                st.metric(
-                    "Persentase",
-                    f"{normal_pct:.2f}%"
-                )
-
-            st.divider()
-
-            st.markdown("### 📌 Karakteristik")
-
-            karakteristik_rendah = [
-
-                "Nilai transaksi relatif lebih rendah.",
-
-                "Jumlah pesanan lebih sedikit.",
-
-                "Variasi menu lebih sederhana.",
-
-                "Waktu persiapan relatif lebih singkat."
-
-            ]
-
-            for item in karakteristik_rendah:
-
-                st.markdown(f"✅ {item}")
-
-            st.divider()
-
-            st.markdown("### 💡 Rekomendasi")
-
-            rekomendasi_rendah = [
-
-                "Pertahankan kualitas pelayanan yang telah berjalan agar kepuasan pelanggan tetap terjaga.",
-
-                "Laksanakan proses pelayanan sesuai dengan prosedur operasional yang telah diterapkan untuk menjaga konsistensi pelayanan.",
-
-                "Manfaatkan hasil analisis sebagai dasar pengelolaan sumber daya.",
-
-                "Lakukan evaluasi terhadap pola transaksi pada kelompok ini untuk mendukung peningkatan kualitas pelayanan secara berkelanjutan.",
-
-                "Gunakan kelompok transaksi ini sebagai acuan dalam menjaga efisiensi operasional tanpa mengurangi kualitas pelayanan."
-
-            ]
-
-            for item in rekomendasi_rendah:
-
-                st.markdown(f"• {item}")
-
-
-    # ======================================================
-    # DATA HASIL CLUSTERING
-    # ======================================================
-
-    st.subheader("📋 Data Hasil Clustering")
-
-    st.markdown("""
-    Tabel berikut menampilkan hasil pengelompokan setiap transaksi
-    berdasarkan proses K-Means Clustering.
-    """)
-
-    hasil_cluster = st.session_state["original_df"].copy()
-
-    hasil_cluster["Cluster"] = result_df["Cluster"]
-
-    cluster_mapping = {
-        0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
-        1: "Pola Transaksi dengan Beban Pelayanan Rendah"
-    }
-
-    hasil_cluster["Hasil Clustering"] = (
-        hasil_cluster["Cluster"].map(cluster_mapping)
     )
 
-    hasil_cluster = hasil_cluster.rename(columns={
-        "username": "Username",
-        "Total_harga": "Total Harga",
-        "Jumlah_pesanan": "Jumlah Pesanan",
-        "Jumlah_jenis_menu": "Jumlah Jenis Menu",
-        "waktu_persiapan_yang_diberikan": "Waktu Persiapan Diberikan",
-        "waktu_persiapan_digunakan": "Waktu Persiapan Digunakan"
-    })
+    st.divider()
 
-    kolom_tampil = [
-        "Username",
-        "Total Harga",
-        "Jumlah Pesanan",
-        "Jumlah Jenis Menu",
-        "Waktu Persiapan Diberikan",
-        "Waktu Persiapan Digunakan",
-        "Hasil Clustering"
-    ]
+    # ======================================================
+    # DATASET PRODUK
+    # ======================================================
 
-    hasil_cluster = hasil_cluster[kolom_tampil]
+    st.subheader("📦 Dataset Produk")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+            "Jumlah Produk",
+            len(product_dataset)
+        )
+
+    with col2:
+
+        st.metric(
+            "Jumlah Variabel",
+            len(product_dataset.columns)
+        )
+
+    st.markdown(
+        """
+Dataset transaksi diubah menjadi dataset
+berdasarkan produk melalui proses agregasi.
+Setiap produk direpresentasikan berdasarkan
+jumlah item yang terjual, frekuensi pembelian,
+total pendapatan, serta rata-rata waktu
+persiapan pesanan.
+        """
+    )
 
     st.dataframe(
-        hasil_cluster,
+
+        product_dataset,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # FEATURE SELECTION
+    # ======================================================
+
+    st.subheader("📊 Variabel Penelitian")
+
+    st.markdown(
+        """
+Tahap Feature Selection dilakukan untuk memilih
+variabel yang digunakan pada proses
+K-Means Clustering sesuai dengan
+variabel penelitian.
+        """
+    )
+
+    st.markdown("### Variabel yang digunakan")
+
+    nama_variabel = {
+        "Jumlah_Item_Produk": "• Jumlah Item Produk",
+        "Frekuensi_Produk": "• Frekuensi Produk",
+        "Total_Pendapatan": "• Total Pendapatan",
+        "Rata2_Waktu_Persiapan_Diberikan": "• Rata-rata Waktu Persiapan Diberikan",
+        "Rata2_Waktu_Persiapan_Digunakan": "• Rata-rata Waktu Persiapan Digunakan"
+    }
+
+    for fitur in FEATURE_COLUMNS:
+
+        st.write(nama_variabel.get(fitur, fitur))
+
+    st.markdown("### Dataset Variabel Penelitian")
+
+    st.dataframe(
+
+        feature_df,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # MIN-MAX NORMALIZATION
+    # ======================================================
+
+    st.subheader("📈 Hasil Min-Max Normalization")
+
+    st.markdown(
+        """
+Normalisasi dilakukan menggunakan metode
+Min-Max Normalization sehingga seluruh
+variabel memiliki rentang nilai antara
+0 sampai 1.
+
+Normalisasi bertujuan agar seluruh variabel
+memiliki skala yang sama sebelum dilakukan
+proses clustering menggunakan algoritma
+K-Means.
+        """
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+
+            "Jumlah Data",
+
+            len(normalized_df)
+
+        )
+
+    with col2:
+
+        st.metric(
+
+            "Jumlah Variabel",
+
+            len(normalized_df.columns)
+
+        )
+
+    st.dataframe(
+
+        normalized_df.round(4),
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # SIMPAN KE SESSION STATE
+    # ======================================================
+
+    st.session_state["cleaned_df"] = cleaned_df
+
+    st.session_state["product_dataset"] = product_dataset
+
+    st.session_state["feature_df"] = feature_df
+
+    st.session_state["normalized_df"] = normalized_df
+
+    st.session_state["scaler"] = scaler
+
+    # ======================================================
+    # RINGKASAN HASIL PREPROCESSING
+    # ======================================================
+
+    st.subheader("📋 Ringkasan Hasil Preprocessing")
+
+    ringkasan_df = {
+        "Tahapan": [
+            "Data Cleaning",
+            "Agregasi Produk",
+            "Feature Selection",
+            "Min-Max Normalization"
+        ],
+        "Status": [
+            "✅ Berhasil",
+            "✅ Berhasil",
+            "✅ Berhasil",
+            "✅ Berhasil"
+        ]
+    }
+
+    st.dataframe(
+        ringkasan_df,
         hide_index=True,
         use_container_width=True
     )
 
-    st.caption(
-        f"Menampilkan {len(hasil_cluster)} transaksi hasil pengelompokan menggunakan metode K-Means Clustering."
-    )
-
     st.divider()
 
     # ======================================================
-    # PROFIL CLUSTER
+    # INFORMASI DATA
     # ======================================================
 
-    st.subheader("📊 Profil Rata-rata Setiap Cluster")
+    st.subheader("📌 Informasi Dataset")
 
-    st.markdown(
-        """
-    Tabel berikut menunjukkan rata-rata nilai setiap variabel
-    pada masing-masing cluster hasil proses K-Means Clustering.
-        """
-    )
+    col1, col2, col3 = st.columns(3)
 
-    profile_df = cluster_profile(result_df)
+    with col1:
 
-    profile_df = profile_df.rename(
+        st.metric(
+            "Jumlah Transaksi Awal",
+            len(df)
+        )
 
-        index={
+    with col2:
 
-            0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
+        st.metric(
+            "Jumlah Produk",
+            len(product_dataset)
+        )
 
-            1: "Pola Transaksi dengan Beban Pelayanan Rendah"
+    with col3:
 
-        }
-
-    )
-
-    st.dataframe(
-
-        profile_df,
-
-        use_container_width=True
-
-    )
+        st.metric(
+            "Variabel Clustering",
+            len(FEATURE_COLUMNS)
+        )
 
     st.divider()
 
@@ -664,20 +424,14 @@ persiapan yang relatif lebih rendah.
 
     st.success(
         """
-Analisis pola transaksi berhasil dilakukan menggunakan
-metode K-Means Clustering.
+Preprocessing data berhasil dilakukan.
 
-Hasil pengelompokan menunjukkan bahwa transaksi Shopee Food
-pada Buffet The Padang Pasir dapat dibedakan menjadi dua
-kelompok berdasarkan karakteristik transaksi, yaitu
-**Pola Transaksi dengan Beban Pelayanan Tinggi**
-dan
-**Pola Transaksi dengan Beban Pelayanan Rendah**.
+Seluruh tahapan preprocessing telah selesai,
+meliputi Data Cleaning, Agregasi Produk,
+Feature Selection, dan Min-Max Normalization.
 
-Hasil analisis ini diharapkan dapat membantu pihak
-Buffet The Padang Pasir dalam memahami karakteristik
-transaksi pelanggan sehingga dapat digunakan sebagai
-salah satu dasar dalam mendukung pengambilan keputusan
-operasional secara lebih terarah.
+Dataset hasil preprocessing telah disimpan
+dan siap digunakan pada proses
+K-Means Clustering.
         """
     )
