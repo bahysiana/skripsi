@@ -115,6 +115,7 @@ PRODUCT_MAPPING = {
 
     "Lontong Gulai Toco": "Lontong Gulai Toco",
     "lontong gulai toco": "Lontong Gulai Toco",
+    "Lontong Gulai Toco + Telur": "Lontong Gulai Toco",
 
     "Lontong Gulai Toco + Telur": "Lontong Gulai Toco + Telur",
     "lontong gulai toco + telur": "Lontong Gulai Toco + Telur",
