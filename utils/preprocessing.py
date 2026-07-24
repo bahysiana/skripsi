@@ -20,6 +20,160 @@ FEATURE_COLUMNS = [
 
 ]
 
+# ==========================================================
+# KAMUS NORMALISASI NAMA PRODUK
+# ==========================================================
+
+PRODUCT_MAPPING = {
+
+    # ======================================================
+    # BUBUR
+    # ======================================================
+
+    "Bubur Cendil": "Bubur Cendil",
+    "Bubur cendil": "Bubur Cendil",
+    "bubur cendil": "Bubur Cendil",
+
+    "Bubur Kacang Hijau": "Bubur Kacang Hijau",
+    "bubur kacang hijau": "Bubur Kacang Hijau",
+
+    "Bubur Kampiun": "Bubur Kampiun",
+    "bubur kampiun": "Bubur Kampiun",
+    "Bubur Karpium": "Bubur Kampiun",
+    "Bubur Karpiun": "Bubur Kampiun",
+    "bubur karpium": "Bubur Kampiun",
+    "bubur karpiun": "Bubur Kampiun",
+
+    "Bubur Ketan Hitam": "Bubur Ketan Hitam",
+    "bubur ketan hitam": "Bubur Ketan Hitam",
+
+    "Bubur Sumsum": "Bubur Sumsum",
+    "bubur sumsum": "Bubur Sumsum",
+
+    # ======================================================
+    # MINUMAN
+    # ======================================================
+
+    "Capuccino Cincau": "Cappuccino Cincau",
+    "Capucino Cincau": "Cappuccino Cincau",
+    "Cappucino Cincau": "Cappuccino Cincau",
+    "capuccino cincau": "Cappuccino Cincau",
+    "capucino cincau": "Cappuccino Cincau",
+
+    "Capuccino Dingin": "Cappuccino Dingin",
+
+    "Capuccino Milk Boba": "Cappuccino Milk Boba",
+
+    "Chocolate Milk Boba": "Chocolate Milk Boba",
+
+    "Extra Joss Susu": "Extra Joss Susu",
+
+    "Jeruk Dingin": "Jeruk Dingin",
+
+    "Jeruk Panas": "Jeruk Panas",
+    "jeruk panas": "Jeruk Panas",
+
+    "Kopi Gingseng": "Kopi Gingseng",
+
+    "Kopi Panas": "Kopi Panas",
+
+    "Soda Susu Nikmat": "Soda Susu Nikmat",
+
+    "Strawberry Milk Boba": "Strawberry Milk Boba",
+
+    "Teh Es": "Teh Es",
+    "teh es": "Teh Es",
+
+    "Teh Panas": "Teh Panas",
+    "teh panas": "Teh Panas",
+
+    "Teh Telur": "Teh Telur",
+    "teh telur": "Teh Telur",
+    "Teh Talua": "Teh Telur",
+    "teh talua": "Teh Telur",
+
+    "Teh Telur Pinang Muda": "Teh Telur Pinang Muda",
+    "teh telur pinang muda": "Teh Telur Pinang Muda",
+    "The Talua Pinang Muda": "Teh Telur Pinang Muda",
+
+    "Teh Telur Tapai": "Teh Telur Tapai",
+
+    # ======================================================
+    # MAKANAN
+    # ======================================================
+
+    "Indomie Kuah": "Indomie Kuah",
+    "indomie kuah": "Indomie Kuah",
+
+    "Lontong Gulai Cubadak + Telur": "Lontong Gulai Cubadak + Telur",
+    "lontong gulai cubadak + telur": "Lontong Gulai Cubadak + Telur",
+
+    "Lontong Gulai Nangka": "Lontong Gulai Nangka (Cubadak)",
+    "Lontong Gulai Nangka (Cubadak)": "Lontong Gulai Nangka (Cubadak)",
+    "lontong gulai nangka": "Lontong Gulai Nangka (Cubadak)",
+    "lontong gulai nangka (cubadak)": "Lontong Gulai Nangka (Cubadak)",
+
+    "Lontong Gulai Toco": "Lontong Gulai Toco",
+    "lontong gulai toco": "Lontong Gulai Toco",
+
+    "Lontong Gulai Toco + Telur": "Lontong Gulai Toco + Telur",
+    "lontong gulai toco + telur": "Lontong Gulai Toco + Telur",
+
+    "Lontong Kikil Gulai Nangka": "Lontong Kikil Gulai Nangka Komplit",
+    "Lontong Kikil Gulai Nangka Komplit": "Lontong Kikil Gulai Nangka Komplit",
+    "lontong kikil gulai nangka": "Lontong Kikil Gulai Nangka Komplit",
+    "lontong kikil gulai nangka komplit": "Lontong Kikil Gulai Nangka Komplit",
+
+    "Lontong Kikil Komplit": "Lontong Kikil Komplit",
+
+    "Lontong Pical": "Lontong Pical",
+    "lontong pical": "Lontong Pical",
+
+    "Lontong Pical Telur": "Lontong Pical Telur",
+
+    "Martabak Mie": "Martabak Mie",
+    "martabak mie": "Martabak Mie",
+
+    "Mie Goreng": "Mie Goreng",
+    "mie goreng": "Mie Goreng",
+
+    "Mie Goreng Special": "Mie Goreng Special",
+    "Mie Goreng Spesial": "Mie Goreng Special",
+    "mie goreng spesial": "Mie Goreng Special",
+
+    "Mie Nyemek": "Mie Nyemek",
+    "mie nyemek": "Mie Nyemek",
+
+    "Mie Nasi Goreng": "Mie Nasi Goreng",
+
+    "Nasi Goreng": "Nasi Goreng",
+    "nasi goreng": "Nasi Goreng",
+
+    "Nasi Goreng Spesial": "Nasi Goreng Spesial",
+
+    "Nasi Tambah": "Nasi Tambah",
+    "Nasi Tambahan": "Nasi Tambah",
+    "nasi tambahan": "Nasi Tambah",
+
+    "Pecel Ayam": "Pecel Ayam",
+
+    "Pecel Ayam Tanpa Nasi": "Pecel Ayam Tanpa Nasi",
+    "pecel ayam tanpa nasi": "Pecel Ayam Tanpa Nasi",
+
+    "Soto Betawi Daging Ayam": "Soto Betawi Daging Ayam",
+    "soto betawi daging ayam": "Soto Betawi Daging Ayam",
+    "Soto Betawi Ayam Daging": "Soto Betawi Daging Ayam",
+
+    "Soto Betawi Daging Sapi": "Soto Betawi Daging Sapi",
+    "soto betawi daging sapi": "Soto Betawi Daging Sapi",
+
+    "Soto Medan": "Soto Medan",
+    "soto medan": "Soto Medan",
+
+    "Soto Medan Tanpa Nasi": "Soto Medan Tanpa Nasi",
+    "soto medan tanpa nasi": "Soto Medan Tanpa Nasi"
+}
+
 
 # ==========================================================
 # DATA CLEANING
@@ -275,7 +429,7 @@ def split_products(df: pd.DataFrame) -> pd.DataFrame:
 
             item.strip()
 
-            for item in str(menu_text).split(",")
+            for item in re.split(r"[;,]", str(menu_text))
 
             if item.strip()
 
@@ -307,6 +461,19 @@ def split_products(df: pd.DataFrame) -> pd.DataFrame:
             menu = menu_list[menu_index]
 
             nama_produk, qty = extract_product_info(menu)
+
+            # ======================================================
+            # NORMALISASI NAMA PRODUK
+            # ======================================================
+
+            nama_produk = " ".join(
+                nama_produk.strip().split()
+            ).title()
+
+            nama_produk = PRODUCT_MAPPING.get(
+                nama_produk,
+                nama_produk
+            )
 
             pendapatan_produk = 0
 
