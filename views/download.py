@@ -8,7 +8,9 @@ from utils.report import (
 
 from utils.clustering import (
     cluster_summary,
-    cluster_profile
+    cluster_profile,
+    identify_high_service_cluster,
+    cluster_name
 )
 
 
@@ -66,15 +68,43 @@ Silakan lakukan proses clustering terlebih dahulu.
 
     profile_df = cluster_profile(cluster_df)
 
+    high_service_cluster = identify_high_service_cluster(
+        profile_df
+    )
+
+    low_service_cluster = (
+        1 if high_service_cluster == 0 else 0
+    )
+
     total_data = len(cluster_df)
 
-    tinggi = int(summary_df.iloc[0]["Jumlah"])
+    tinggi = int(
+        summary_df.loc[
+            summary_df["Cluster"] == high_service_cluster,
+            "Jumlah"
+        ].values[0]
+    )
 
-    normal = int(summary_df.iloc[1]["Jumlah"])
+    normal = int(
+        summary_df.loc[
+            summary_df["Cluster"] == low_service_cluster,
+            "Jumlah"
+        ].values[0]
+    )
 
-    tinggi_pct = float(summary_df.iloc[0]["Persentase"])
+    tinggi_pct = float(
+        summary_df.loc[
+            summary_df["Cluster"] == high_service_cluster,
+            "Persentase"
+        ].values[0]
+    )
 
-    normal_pct = float(summary_df.iloc[1]["Persentase"])
+    normal_pct = float(
+        summary_df.loc[
+            summary_df["Cluster"] == low_service_cluster,
+            "Persentase"
+        ].values[0]
+    )
 
     # ======================================================
     # INFORMASI
