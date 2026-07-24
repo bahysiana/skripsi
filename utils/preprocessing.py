@@ -778,6 +778,8 @@ def preprocess_dataset(df: pd.DataFrame):
 
     return (
 
+        cleaned_df,
+
         product_dataset,
 
         feature_df,
