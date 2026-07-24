@@ -284,5 +284,5 @@ Proses ini **tidak dapat dibatalkan**.
 - Pastikan dataset sesuai dengan format penelitian.
 - Klik **Simpan Dataset ke Database**.
 - Dataset yang tersimpan akan digunakan pada menu **Preprocessing**.
-- Seluruh proses cleaning, feature engineering, dan normalisasi dilakukan pada menu **Preprocessing**.
+- Pada menu **Preprocessing** akan dilakukan proses pembersihan data, agregasi produk, pemilihan variabel penelitian, dan normalisasi Min-Max sebelum proses clustering.
 """)
