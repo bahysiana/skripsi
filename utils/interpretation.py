@@ -1,5 +1,10 @@
 import pandas as pd
 
+from utils.clustering import (
+    identify_high_service_cluster,
+    cluster_name
+)
+
 
 # ==========================================================
 # INTERPRETASI CLUSTER
@@ -7,90 +12,137 @@ import pandas as pd
 
 def generate_interpretation(profile_df: pd.DataFrame):
     """
-    Menentukan interpretasi dan rekomendasi
-    berdasarkan profil cluster.
+    Menghasilkan interpretasi dan rekomendasi
+    berdasarkan profil masing-masing cluster.
+
+    Parameters
+    ----------
+    profile_df : DataFrame
+        DataFrame hasil cluster_profile().
+
+    Returns
+    -------
+    list
+        Daftar interpretasi setiap cluster.
     """
 
     interpretation = []
 
-    # Menentukan cluster dengan beban pelayanan tinggi
-    total_harga = profile_df["Total_harga"]
-
-    high_cluster = total_harga.idxmax()
-    low_cluster = total_harga.idxmin()
-
     # ======================================================
-    # CLUSTER BEBAN TINGGI
+    # IDENTIFIKASI CLUSTER
     # ======================================================
 
-    interpretation.append({
-
-        "cluster": int(high_cluster),
-
-        "nama_cluster": "Pola Transaksi dengan Beban Pelayanan Tinggi",
-
-        "karakteristik": [
-
-            "Memiliki nilai total transaksi relatif tinggi.",
-
-            "Jumlah pesanan dalam satu transaksi lebih banyak.",
-
-            "Variasi menu yang dipesan lebih beragam.",
-
-            "Membutuhkan waktu persiapan yang lebih lama."
-
-        ],
-
-        "rekomendasi": [
-
-            "Prioritaskan penanganan transaksi pada cluster ini agar pelayanan tetap optimal.",
-
-            "Pastikan ketersediaan bahan baku untuk memenuhi kebutuhan transaksi dengan beban pelayanan tinggi.",
-
-            "Atur pembagian tugas karyawan secara efektif agar proses pelayanan dapat dilakukan secara lebih optimal.",
-
-            "Lakukan pemantauan terhadap waktu persiapan pesanan untuk menjaga ketepatan pelayanan kepada pelanggan.",
-
-            "Gunakan hasil analisis cluster sebagai dasar dalam penyusunan strategi operasional dan peningkatan kualitas pelayanan."
-
-        ]
-
-    })
+    high_service_cluster = identify_high_service_cluster(
+        profile_df
+    )
 
     # ======================================================
-    # CLUSTER BEBAN RENDAH
+    # MEMBUAT INTERPRETASI
     # ======================================================
 
-    interpretation.append({
+    for cluster in profile_df.index:
 
-        "cluster": int(low_cluster),
+        nama = cluster_name(
+            cluster,
+            high_service_cluster
+        )
 
-        "nama_cluster": "Pola Transaksi dengan Beban Pelayanan Rendah",
+        data = profile_df.loc[cluster]
 
-        "karakteristik": [
+        if cluster == high_service_cluster:
 
-            "Nilai transaksi relatif lebih rendah.",
+            karakteristik = [
 
-            "Jumlah pesanan lebih sedikit.",
+                f"Rata-rata jumlah item produk sebesar {data['Jumlah_Item_Produk']:.4f}.",
 
-            "Variasi menu lebih sederhana.",
+                f"Rata-rata frekuensi produk sebesar {data['Frekuensi_Produk']:.4f}.",
 
-            "Waktu persiapan relatif lebih singkat."
+                f"Rata-rata total pendapatan sebesar {data['Total_Pendapatan']:.4f}.",
 
-        ],
+                f"Rata-rata waktu persiapan yang diberikan sebesar {data['Rata2_Waktu_Persiapan_Diberikan']:.4f}.",
 
-        "rekomendasi": [
+                f"Rata-rata waktu persiapan yang digunakan sebesar {data['Rata2_Waktu_Persiapan_Digunakan']:.4f}.",
 
-            "Pertahankan kualitas pelayanan yang sudah berjalan dengan baik.",
+                "Produk pada cluster ini memiliki tingkat aktivitas yang lebih tinggi dibandingkan cluster lainnya."
 
-            "Manfaatkan waktu luang untuk menyiapkan bahan baku.",
+            ]
 
-            "Pertahankan konsistensi waktu penyajian pesanan.",
+            rekomendasi = [
 
-            "Gunakan hasil cluster sebagai pendukung evaluasi operasional toko."
+                "Prioritaskan ketersediaan stok bahan baku untuk produk pada cluster ini.",
 
-        ]
+                "Pastikan proses persiapan produk dilakukan secara optimal agar pelayanan tetap terjaga.",
 
-    })
+                "Jadikan produk pada cluster ini sebagai prioritas dalam operasional harian.",
+
+                "Lakukan pemantauan terhadap waktu persiapan agar pelayanan tetap konsisten.",
+
+                "Manfaatkan hasil clustering sebagai dasar dalam penyusunan strategi operasional dan peningkatan kualitas pelayanan."
+
+            ]
+
+        else:
+
+            karakteristik = [
+
+                f"Rata-rata jumlah item produk sebesar {data['Jumlah_Item_Produk']:.4f}.",
+
+                f"Rata-rata frekuensi produk sebesar {data['Frekuensi_Produk']:.4f}.",
+
+                f"Rata-rata total pendapatan sebesar {data['Total_Pendapatan']:.4f}.",
+
+                f"Rata-rata waktu persiapan yang diberikan sebesar {data['Rata2_Waktu_Persiapan_Diberikan']:.4f}.",
+
+                f"Rata-rata waktu persiapan yang digunakan sebesar {data['Rata2_Waktu_Persiapan_Digunakan']:.4f}.",
+
+                "Produk pada cluster ini memiliki tingkat aktivitas yang relatif lebih rendah dibandingkan cluster prioritas."
+
+            ]
+
+            rekomendasi = [
+
+                "Lakukan promosi terhadap produk pada cluster ini untuk meningkatkan frekuensi pembelian.",
+
+                "Pertimbangkan strategi bundling dengan produk yang memiliki tingkat permintaan tinggi.",
+
+                "Evaluasi strategi pemasaran untuk meningkatkan kontribusi produk terhadap pendapatan.",
+
+                "Lakukan pemantauan terhadap perkembangan permintaan produk secara berkala.",
+
+                "Gunakan hasil clustering sebagai bahan evaluasi dalam penyusunan strategi penjualan."
+
+            ]
+
+        interpretation.append({
+
+            "cluster": int(cluster),
+
+            "nama_cluster": nama,
+
+            "karakteristik": karakteristik,
+
+            "rekomendasi": rekomendasi
+
+        })
 
     return interpretation
+
+
+# ==========================================================
+# KESIMPULAN
+# ==========================================================
+
+def generate_conclusion():
+    """
+    Menghasilkan kesimpulan umum hasil clustering.
+    """
+
+    return (
+        "Berdasarkan hasil K-Means Clustering, produk berhasil "
+        "dikelompokkan menjadi dua cluster yaitu Pola Transaksi "
+        "dengan Beban Pelayanan Tinggi dan Pola Transaksi dengan "
+        "Beban Pelayanan Rendah. Hasil pengelompokan ini dapat "
+        "digunakan sebagai dasar dalam menentukan prioritas "
+        "pelayanan, pengelolaan stok bahan baku, serta penyusunan "
+        "strategi operasional pada Buffet The Padang Pasir."
+    )
