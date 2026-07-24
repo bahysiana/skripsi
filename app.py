@@ -145,9 +145,9 @@ Analisis Pola Transaksi Shopee Food
         use_container_width=True
     ):
 
-    st.session_state.logged_in = False
+        st.session_state.logged_in = False
 
-    st.rerun()
+        st.rerun()
 
     st.caption("Buffet The Padang Pasir")
 
