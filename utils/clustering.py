@@ -26,7 +26,7 @@ def perform_clustering(
     Parameters
     ----------
     df : DataFrame
-        Dataset hasil preprocessing.
+        Dataset hasil preprocessing (sudah dinormalisasi).
 
     n_clusters : int
         Jumlah cluster.
@@ -37,7 +37,7 @@ def perform_clustering(
         Dataset beserta label cluster.
 
     centroid_df : DataFrame
-        Nilai centroid.
+        Nilai centroid setiap cluster.
     """
 
     model = KMeans(
@@ -75,7 +75,8 @@ def cluster_summary(
     cluster_df: pd.DataFrame
 ):
     """
-    Menghasilkan ringkasan jumlah anggota cluster.
+    Menghasilkan ringkasan jumlah anggota
+    pada setiap cluster.
     """
 
     summary = (
@@ -139,16 +140,37 @@ def cluster_profile(
 
 
 # ==========================================================
+# IDENTIFIKASI CLUSTER
+# ==========================================================
+
+def identify_high_service_cluster(
+    profile_df: pd.DataFrame
+):
+    """
+    Menentukan cluster dengan beban pelayanan
+    tertinggi berdasarkan rata-rata seluruh
+    variabel penelitian.
+    """
+
+    score = profile_df.mean(axis=1)
+
+    return score.idxmax()
+
+
+# ==========================================================
 # NAMA CLUSTER
 # ==========================================================
 
-def cluster_name(cluster: int):
+def cluster_name(
+    cluster: int,
+    high_service_cluster: int
+):
     """
-    Mengubah nomor cluster menjadi
-    nama yang mudah dipahami.
+    Mengubah label cluster menjadi nama
+    yang lebih mudah dipahami.
     """
 
-    if cluster == 0:
+    if cluster == high_service_cluster:
 
         return "Pola Transaksi dengan Beban Pelayanan Tinggi"
 
