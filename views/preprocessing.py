@@ -12,15 +12,24 @@ from utils.preprocessing import (
 
 
 # ==========================================================
-# PREPROCESSING
+# HALAMAN PREPROCESSING
 # ==========================================================
 
 def show_preprocessing():
 
+    # ======================================================
+    # HEADER
+    # ======================================================
+
     st.title("🧹 Preprocessing")
 
     st.caption(
-        "Melakukan Data Cleaning, Feature Engineering, dan Min-Max Normalization."
+        """
+Melakukan proses Data Cleaning,
+Agregasi Produk, Feature Selection,
+dan Min-Max Normalization
+sebelum proses K-Means Clustering.
+        """
     )
 
     st.divider()
@@ -35,42 +44,21 @@ def show_preprocessing():
             """
 Belum ada dataset pada database.
 
-Silakan upload dataset terlebih dahulu melalui menu **Kelola Data**.
+Silakan upload dataset terlebih dahulu
+melalui menu **Kelola Data**.
             """
         )
 
         return
 
     # ======================================================
-    # LOAD DATA
+    # LOAD DATASET
     # ======================================================
 
     df = get_all_data()
 
     # ======================================================
-    # DEBUG DATASET
-    # ======================================================
-
-    with st.expander("🔍 Debug Dataset"):
-
-        st.write("Nama Kolom")
-
-        st.write(df.columns.tolist())
-
-        st.write("Tipe Data")
-
-        st.write(df.dtypes)
-
-        st.write("5 Data Pertama")
-
-        st.dataframe(
-            df.head(),
-            use_container_width=True,
-            hide_index=True
-        )
-
-    # ======================================================
-    # INFORMASI
+    # INFORMASI PREPROCESSING
     # ======================================================
 
     st.info(
@@ -79,11 +67,15 @@ Tahapan preprocessing yang dilakukan:
 
 1. Data Cleaning
 
-2. Feature Engineering
+2. Agregasi Produk
 
-3. Pemilihan Variabel
+3. Feature Selection
 
 4. Min-Max Normalization
+
+Dataset hasil preprocessing
+akan digunakan pada proses
+K-Means Clustering.
         """
     )
 
@@ -100,140 +92,346 @@ Tahapan preprocessing yang dilakukan:
     with col1:
 
         st.metric(
-            "Jumlah Data",
+
+            "Jumlah Transaksi",
+
             len(df)
+
+        )
+
+    with col2:
+
+        st.metric(
+
+            "Jumlah Kolom",
+
+            len(df.columns)
+
+        )
+
+    st.dataframe(
+
+        df,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # TOMBOL PREPROCESSING
+    # ======================================================
+
+    mulai = st.button(
+
+        "▶ Mulai Preprocessing",
+
+        type="primary",
+
+        use_container_width=True
+
+    )
+
+    if not mulai:
+
+        return
+
+    # ======================================================
+    # PROSES PREPROCESSING
+    # ======================================================
+
+    with st.spinner("Sedang melakukan preprocessing data..."):
+
+        (
+            cleaned_df,
+            product_dataset,
+            feature_df,
+            normalized_df,
+            scaler
+        ) = preprocess_dataset(df)
+
+    st.success(
+        "Preprocessing berhasil dilakukan."
+    )
+
+    st.divider()
+
+    # ======================================================
+    # HASIL DATA CLEANING
+    # ======================================================
+
+    st.subheader("🧹 Hasil Data Cleaning")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+            "Jumlah Data",
+            len(cleaned_df)
         )
 
     with col2:
 
         st.metric(
             "Jumlah Kolom",
-            len(df.columns)
+            len(cleaned_df.columns)
         )
 
+    st.markdown(
+        """
+Tahap ini bertujuan untuk membersihkan dataset
+dari data duplikat, data kosong, serta merapikan
+struktur data sehingga siap digunakan pada proses
+berikutnya.
+        """
+    )
+
     st.dataframe(
-        df,
-        use_container_width=True,
-        hide_index=True
+
+        cleaned_df,
+
+        hide_index=True,
+
+        use_container_width=True
+
     )
 
     st.divider()
 
     # ======================================================
-    # BUTTON PREPROCESS
+    # DATASET PRODUK
     # ======================================================
 
-    if st.button(
-        "▶ Mulai Preprocessing",
-        type="primary",
-        use_container_width=True
-    ):
+    st.subheader("📦 Dataset Produk")
 
-        try:
+    col1, col2 = st.columns(2)
 
-            with st.spinner("Sedang melakukan preprocessing..."):
-
-                original_df, feature_df, normalized_df = preprocess_dataset(df)
-
-        except Exception as e:
-
-            st.error("Preprocessing gagal.")
-
-            st.code(str(e))
-
-            return
-
-        st.success(
-            "Preprocessing berhasil dilakukan."
-        )
-
-        st.divider()
-
-        # ==================================================
-        # HASIL CLEANING
-        # ==================================================
-
-        st.subheader("🧹 Hasil Data Cleaning")
+    with col1:
 
         st.metric(
+            "Jumlah Produk",
+            len(product_dataset)
+        )
+
+    with col2:
+
+        st.metric(
+            "Jumlah Variabel",
+            len(product_dataset.columns)
+        )
+
+    st.markdown(
+        """
+Dataset transaksi diubah menjadi dataset
+berdasarkan produk melalui proses agregasi.
+Setiap produk direpresentasikan berdasarkan
+jumlah item yang terjual, frekuensi pembelian,
+total pendapatan, serta rata-rata waktu
+persiapan pesanan.
+        """
+    )
+
+    st.dataframe(
+
+        product_dataset,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # FEATURE SELECTION
+    # ======================================================
+
+    st.subheader("📊 Variabel Penelitian")
+
+    st.markdown(
+        """
+Tahap Feature Selection dilakukan untuk memilih
+variabel yang digunakan pada proses
+K-Means Clustering sesuai dengan
+variabel penelitian.
+        """
+    )
+
+    st.markdown("### Variabel yang digunakan")
+
+    nama_variabel = {
+        "Jumlah_Item_Produk": "• Jumlah Item Produk",
+        "Frekuensi_Produk": "• Frekuensi Produk",
+        "Total_Pendapatan": "• Total Pendapatan",
+        "Rata2_Waktu_Persiapan_Diberikan": "• Rata-rata Waktu Persiapan Diberikan",
+        "Rata2_Waktu_Persiapan_Digunakan": "• Rata-rata Waktu Persiapan Digunakan"
+    }
+
+    for fitur in FEATURE_COLUMNS:
+
+        st.write(nama_variabel.get(fitur, fitur))
+
+    st.markdown("### Dataset Variabel Penelitian")
+
+    st.dataframe(
+
+        feature_df,
+
+        hide_index=True,
+
+        use_container_width=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # MIN-MAX NORMALIZATION
+    # ======================================================
+
+    st.subheader("📈 Hasil Min-Max Normalization")
+
+    st.markdown(
+        """
+Normalisasi dilakukan menggunakan metode
+Min-Max Normalization sehingga seluruh
+variabel memiliki rentang nilai antara
+0 sampai 1.
+
+Normalisasi bertujuan agar seluruh variabel
+memiliki skala yang sama sebelum dilakukan
+proses clustering menggunakan algoritma
+K-Means.
+        """
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.metric(
+
             "Jumlah Data",
-            len(original_df)
+
+            len(normalized_df)
+
         )
 
-        st.dataframe(
-            original_df,
-            use_container_width=True,
-            hide_index=True
+    with col2:
+
+        st.metric(
+
+            "Jumlah Variabel",
+
+            len(normalized_df.columns)
+
         )
 
-        st.divider()
+    st.dataframe(
 
-        # ==================================================
-        # FEATURE ENGINEERING
-        # ==================================================
+        normalized_df.round(4),
 
-        st.subheader("⚙️ Feature Engineering")
+        hide_index=True,
 
-        st.success(
-            """
-Kolom baru berhasil ditambahkan:
+        use_container_width=True
 
-• Jumlah_jenis_menu
-            """
+    )
+
+    st.divider()
+
+    # ======================================================
+    # SIMPAN KE SESSION STATE
+    # ======================================================
+
+    st.session_state["cleaned_df"] = cleaned_df
+
+    st.session_state["product_dataset"] = product_dataset
+
+    st.session_state["feature_df"] = feature_df
+
+    st.session_state["normalized_df"] = normalized_df
+
+    st.session_state["scaler"] = scaler
+
+    # ======================================================
+    # RINGKASAN HASIL PREPROCESSING
+    # ======================================================
+
+    st.subheader("📋 Ringkasan Hasil Preprocessing")
+
+    ringkasan_df = {
+        "Tahapan": [
+            "Data Cleaning",
+            "Agregasi Produk",
+            "Feature Selection",
+            "Min-Max Normalization"
+        ],
+        "Status": [
+            "✅ Berhasil",
+            "✅ Berhasil",
+            "✅ Berhasil",
+            "✅ Berhasil"
+        ]
+    }
+
+    st.dataframe(
+        ringkasan_df,
+        hide_index=True,
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # ======================================================
+    # INFORMASI DATA
+    # ======================================================
+
+    st.subheader("📌 Informasi Dataset")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.metric(
+            "Jumlah Transaksi Awal",
+            len(df)
         )
 
-        st.dataframe(
-            original_df,
-            use_container_width=True,
-            hide_index=True
+    with col2:
+
+        st.metric(
+            "Jumlah Produk",
+            len(product_dataset)
         )
 
-        st.divider()
+    with col3:
 
-        # ==================================================
-        # VARIABEL PENELITIAN
-        # ==================================================
-
-        st.subheader("📊 Variabel Penelitian")
-
-        st.write(FEATURE_COLUMNS)
-
-        st.dataframe(
-            feature_df,
-            use_container_width=True,
-            hide_index=True
+        st.metric(
+            "Variabel Clustering",
+            len(FEATURE_COLUMNS)
         )
 
-        st.divider()
+    st.divider()
 
-        # ==================================================
-        # NORMALISASI
-        # ==================================================
+    # ======================================================
+    # PENUTUP
+    # ======================================================
 
-        st.subheader("📈 Hasil Min-Max Normalization")
+    st.success(
+        """
+Preprocessing data berhasil dilakukan.
 
-        st.dataframe(
-            normalized_df,
-            use_container_width=True,
-            hide_index=True
-        )
+Seluruh tahapan preprocessing telah selesai,
+meliputi Data Cleaning, Agregasi Produk,
+Feature Selection, dan Min-Max Normalization.
 
-        st.divider()
-
-        # ==================================================
-        # SIMPAN SESSION
-        # ==================================================
-
-        st.session_state["original_df"] = original_df
-
-        st.session_state["feature_df"] = feature_df
-
-        st.session_state["normalized_df"] = normalized_df
-
-        st.success(
-            """
-Dataset hasil preprocessing berhasil disimpan.
-
-Silakan lanjut ke menu **Clustering**.
-            """
-        )
+Dataset hasil preprocessing telah disimpan
+dan siap digunakan pada proses
+K-Means Clustering.
+        """
+    )
