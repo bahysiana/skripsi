@@ -10,6 +10,9 @@ from views.kelola_data import show_kelola_data
 from views.preprocessing import show_preprocessing
 from views.clustering import show_clustering
 from views.download import show_download
+from views.login import show_login
+
+from utils.auth import initialize_auth
 
 # =====================================================
 # KONFIGURASI APLIKASI
@@ -21,6 +24,12 @@ st.set_page_config(
     page_icon="🍽️",
     initial_sidebar_state="expanded"
 )
+
+# =====================================================
+# INITIALIZE AUTH
+# =====================================================
+
+initialize_auth()
 
 # =====================================================
 # LOAD CSS
@@ -42,6 +51,23 @@ except FileNotFoundError:
 
     pass
 
+# =====================================================
+# SESSION LOGIN
+# =====================================================
+
+if "logged_in" not in st.session_state:
+
+    st.session_state.logged_in = False
+
+# =====================================================
+# LOGIN CHECK
+# =====================================================
+
+if not st.session_state.logged_in:
+
+    show_login()
+
+    st.stop()
 # =====================================================
 # SIDEBAR
 # =====================================================
@@ -113,6 +139,15 @@ Analisis Pola Transaksi Shopee Food
     )
 
     st.divider()
+
+    if st.button(
+        "🚪 Logout",
+        use_container_width=True
+    ):
+
+    st.session_state.logged_in = False
+
+    st.rerun()
 
     st.caption("Buffet The Padang Pasir")
 
