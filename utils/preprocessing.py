@@ -2,22 +2,21 @@ import re
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-
 # ==========================================================
 # VARIABEL PENELITIAN
 # ==========================================================
 
 FEATURE_COLUMNS = [
 
-    "Total_harga",
+    "Jumlah_Item_Produk",
 
-    "Jumlah_pesanan",
+    "Frekuensi_Produk",
 
-    "Jumlah_jenis_menu",
+    "Total_Pendapatan",
 
-    "waktu_persiapan_yang_diberikan",
+    "Rata2_Waktu_Persiapan_Diberikan",
 
-    "waktu_persiapan_digunakan"
+    "Rata2_Waktu_Persiapan_Digunakan"
 
 ]
 
@@ -28,15 +27,15 @@ FEATURE_COLUMNS = [
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Membersihkan dataset.
+    Membersihkan dataset sebelum diproses.
     """
 
     df = df.copy()
 
-    # Hilangkan spasi nama kolom
+    # Hilangkan spasi pada nama kolom
     df.columns = df.columns.str.strip()
 
-    # Hapus duplikasi
+    # Hapus data duplikat
     df = df.drop_duplicates()
 
     # Hapus baris yang seluruh kolomnya kosong
@@ -46,47 +45,20 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ==========================================================
-# HITUNG JUMLAH JENIS MENU
-# ==========================================================
-
-def count_menu_types(menu):
-
-    if pd.isna(menu):
-        return 0
-
-    menu = str(menu).strip()
-
-    if menu == "":
-        return 0
-
-    daftar_menu = [
-
-        item.strip()
-
-        for item in menu.split(",")
-
-        if item.strip()
-
-    ]
-
-    return len(daftar_menu)
-
-
-# ==========================================================
 # KONVERSI ANGKA
 # ==========================================================
 
 def convert_number(value):
     """
-    Mengubah berbagai format angka menjadi numerik.
+    Mengubah berbagai format angka menjadi integer.
 
     Contoh:
-
-    30000 -> 30000
+    --------
+    Rp30.000 -> 30000
 
     30.000 -> 30000
 
-    Rp30.000 -> 30000
+    30000 -> 30000
     """
 
     if pd.isna(value):
@@ -94,15 +66,13 @@ def convert_number(value):
 
     text = str(value).strip()
 
-    if text in [
+    if text.lower() in [
 
         "",
 
         "-",
 
         "--",
-
-        "None",
 
         "none",
 
@@ -113,16 +83,14 @@ def convert_number(value):
         return None
 
     # Hilangkan tulisan Rp
-    text = text.replace("Rp", "")
-    text = text.replace("rp", "")
+    text = re.sub(r"rp", "", text, flags=re.IGNORECASE)
 
     # Hilangkan titik ribuan
     text = text.replace(".", "")
 
-    # Ambil angka
     angka = re.findall(r"\d+", text)
 
-    if len(angka) == 0:
+    if not angka:
         return None
 
     return int("".join(angka))
@@ -134,13 +102,13 @@ def convert_number(value):
 
 def convert_minutes(value):
     """
-    Mengubah
+    Mengubah format waktu menjadi menit.
 
+    Contoh:
+    --------
     13 menit -> 13
 
-    8 menit -> 8
-
-    - -> None
+    8 Menit -> 8
     """
 
     if pd.isna(value):
@@ -166,82 +134,452 @@ def convert_minutes(value):
 
     angka = re.findall(r"\d+", text)
 
-    if len(angka) == 0:
-
+    if not angka:
         return None
 
     return int(angka[0])
-    # ==========================================================
-# FEATURE ENGINEERING
+
+
+# ==========================================================
+# EKSTRAK NAMA PRODUK DAN QUANTITY
 # ==========================================================
 
-def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+def extract_product_info(menu_name):
     """
-    Menambahkan variabel penelitian yang
-    diperlukan pada proses clustering.
+    Mengekstrak nama produk dan jumlah item.
+
+    Contoh:
+    --------
+    Ayam Goreng
+        -> ("Ayam Goreng", 1)
+
+    Ayam Goreng (2x)
+        -> ("Ayam Goreng", 2)
+
+    Ayam Goreng x2
+        -> ("Ayam Goreng", 2)
+
+    2x Ayam Goreng
+        -> ("Ayam Goreng", 2)
+
+    x2 Ayam Goreng
+        -> ("Ayam Goreng", 2)
     """
 
-    df = df.copy()
+    if pd.isna(menu_name):
+        return "", 1
+
+    text = str(menu_name).strip()
+
+    qty = 1
+
+    patterns = [
+
+        r"\(\s*(\d+)\s*x\s*\)",
+
+        r"(\d+)\s*x",
+
+        r"x\s*(\d+)"
+
+    ]
+
+    for pattern in patterns:
+
+        match = re.search(
+
+            pattern,
+
+            text,
+
+            flags=re.IGNORECASE
+
+        )
+
+        if match:
+
+            qty = int(match.group(1))
+
+            text = re.sub(
+
+                pattern,
+
+                "",
+
+                text,
+
+                flags=re.IGNORECASE
+
+            )
+
+            break
+
+    # Hapus kurung kosong
+    text = re.sub(r"\(\)", "", text)
+
+    # Rapikan spasi
+    text = " ".join(text.split())
+
+    return text.strip(), qty
+
+# ==========================================================
+# MEMECAH TRANSAKSI MENJADI DATA PRODUK
+# ==========================================================
+
+def split_products(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mengubah setiap transaksi menjadi beberapa baris produk.
+
+    Output:
+    ----------------------------------------------------------
+    Produk
+    Qty
+    Pendapatan_Produk
+    Waktu_Diberikan
+    Waktu_Digunakan
+    ----------------------------------------------------------
+
+    Fungsi ini sudah menangani dua format harga Shopee Food:
+
+    Format A
+    --------
+    Menu :
+        Bubur Kampiun (2x)
+
+    Harga :
+        27000
+
+    Format B
+    --------
+    Menu :
+        Mie Nyemek (2x)
+
+    Harga :
+        17500,17500
+    """
+
+    rows = []
+
+    for _, row in df.iterrows():
+
+        menu_text = row.get("menu_yang_dibeli", "")
+        harga_text = row.get("harga_per_menu", "")
+
+        if pd.isna(menu_text):
+            continue
+
+        # --------------------------------------------
+        # Pecah daftar menu
+        # --------------------------------------------
+
+        menu_list = [
+
+            item.strip()
+
+            for item in str(menu_text).split(",")
+
+            if item.strip()
+
+        ]
+
+        # --------------------------------------------
+        # Pecah daftar harga
+        # --------------------------------------------
+
+        harga_list = []
+
+        if pd.notna(harga_text):
+
+            harga_list = [
+
+                convert_number(x)
+
+                for x in str(harga_text).split(",")
+
+                if str(x).strip() != ""
+
+            ]
+
+        menu_index = 0
+        harga_index = 0
+
+        while menu_index < len(menu_list):
+
+            menu = menu_list[menu_index]
+
+            nama_produk, qty = extract_product_info(menu)
+
+            pendapatan_produk = 0
+
+            # =====================================================
+            # TIDAK ADA HARGA
+            # =====================================================
+
+            if len(harga_list) == 0:
+
+                pendapatan_produk = None
+
+            # =====================================================
+            # FORMAT 1
+            # jumlah harga == jumlah menu
+            # =====================================================
+
+            elif len(harga_list) == len(menu_list):
+
+                pendapatan_produk = harga_list[menu_index]
+
+            # =====================================================
+            # FORMAT 2
+            # harga mengikuti quantity
+            # =====================================================
+
+            else:
+
+                if harga_index + qty <= len(harga_list):
+
+                    daftar_harga = harga_list[
+                        harga_index:
+                        harga_index + qty
+                    ]
+
+                    pendapatan_produk = sum(
+
+                        h
+
+                        for h in daftar_harga
+
+                        if h is not None
+
+                    )
+
+                    harga_index += qty
+
+                else:
+
+                    if harga_index < len(harga_list):
+
+                        pendapatan_produk = harga_list[harga_index]
+
+                        harga_index += 1
+
+                    else:
+
+                        pendapatan_produk = None
+
+            rows.append({
+
+                "Produk": nama_produk,
+
+                "Qty": qty,
+
+                "Pendapatan_Produk": pendapatan_produk,
+
+                "Waktu_Diberikan": convert_minutes(
+
+                    row.get(
+                        "waktu_persiapan_yang_diberikan"
+                    )
+
+                ),
+
+                "Waktu_Digunakan": convert_minutes(
+
+                    row.get(
+                        "waktu_persiapan_digunakan"
+                    )
+
+                )
+
+            })
+
+            menu_index += 1
+
+    product_df = pd.DataFrame(rows)
+
+    return product_df
+
+# ==========================================================
+# MEMBANGUN DATASET BERDASARKAN PRODUK
+# ==========================================================
+
+def build_product_dataset(product_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mengubah hasil split_products()
+    menjadi dataset agregasi per produk.
+    """
+
+    if product_df.empty:
+
+        return pd.DataFrame(columns=[
+
+            "Produk",
+
+            "Jumlah_Item_Produk",
+
+            "Frekuensi_Produk",
+
+            "Total_Pendapatan",
+
+            "Rata2_Waktu_Persiapan_Diberikan",
+
+            "Rata2_Waktu_Persiapan_Digunakan"
+
+        ])
+
+    df = product_df.copy()
 
     # ======================================================
-    # JUMLAH JENIS MENU
+    # Pastikan seluruh kolom numerik
     # ======================================================
 
-    df["Jumlah_jenis_menu"] = (
-        df["menu_yang_dibeli"]
-        .apply(count_menu_types)
+    numeric_columns = [
+
+        "Qty",
+
+        "Pendapatan_Produk",
+
+        "Waktu_Diberikan",
+
+        "Waktu_Digunakan"
+
+    ]
+
+    for col in numeric_columns:
+
+        df[col] = pd.to_numeric(
+
+            df[col],
+
+            errors="coerce"
+
+        )
+
+    # ======================================================
+    # Hilangkan produk kosong
+    # ======================================================
+
+    df = df[
+
+        df["Produk"].notna()
+
+    ]
+
+    df = df[
+
+        df["Produk"].str.strip() != ""
+
+    ]
+
+    # ======================================================
+    # GROUP BY PRODUK
+    # ======================================================
+
+    result = (
+
+        df
+
+        .groupby(
+
+            "Produk",
+
+            as_index=False
+
+        )
+
+        .agg(
+
+            Jumlah_Item_Produk=(
+
+                "Qty",
+
+                "sum"
+
+            ),
+
+            Frekuensi_Produk=(
+
+                "Produk",
+
+                "count"
+
+            ),
+
+            Total_Pendapatan=(
+
+                "Pendapatan_Produk",
+
+                "sum"
+
+            ),
+
+            Rata2_Waktu_Persiapan_Diberikan=(
+
+                "Waktu_Diberikan",
+
+                "mean"
+
+            ),
+
+            Rata2_Waktu_Persiapan_Digunakan=(
+
+                "Waktu_Digunakan",
+
+                "mean"
+
+            )
+
+        )
+
     )
 
     # ======================================================
-    # TOTAL HARGA
+    # Pembulatan rata-rata
     # ======================================================
 
-    df["Total_harga"] = (
-        df["Total_harga"]
-        .apply(convert_number)
+    result[
+
+        "Rata2_Waktu_Persiapan_Diberikan"
+
+    ] = (
+
+        result[
+
+            "Rata2_Waktu_Persiapan_Diberikan"
+
+        ]
+
+        .round(2)
+
     )
 
-    # ======================================================
-    # JUMLAH PESANAN
-    # ======================================================
+    result[
 
-    df["Jumlah_pesanan"] = (
-        df["Jumlah_pesanan"]
-        .apply(convert_number)
+        "Rata2_Waktu_Persiapan_Digunakan"
+
+    ] = (
+
+        result[
+
+            "Rata2_Waktu_Persiapan_Digunakan"
+
+        ]
+
+        .round(2)
+
     )
 
-    # ======================================================
-    # WAKTU PERSIAPAN DIBERIKAN
-    # ======================================================
-
-    df["waktu_persiapan_yang_diberikan"] = (
-        df["waktu_persiapan_yang_diberikan"]
-        .apply(convert_minutes)
-    )
-
-    # ======================================================
-    # WAKTU PERSIAPAN DIGUNAKAN
-    # ======================================================
-
-    df["waktu_persiapan_digunakan"] = (
-        df["waktu_persiapan_digunakan"]
-        .apply(convert_minutes)
-    )
-
-    return df
-
+    return result
 
 # ==========================================================
 # SELECT FEATURE
 # ==========================================================
 
-def select_features(df: pd.DataFrame) -> pd.DataFrame:
+def select_features(product_dataset: pd.DataFrame):
     """
-    Mengambil variabel penelitian dan
-    membersihkan data yang tidak valid.
+    Mengambil variabel penelitian
+    yang akan digunakan pada proses clustering.
     """
 
-    feature_df = df.copy()
+    feature_df = product_dataset.copy()
 
     # ======================================================
     # VALIDASI KOLOM
@@ -274,7 +612,7 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
     feature_df = feature_df[FEATURE_COLUMNS].copy()
 
     # ======================================================
-    # KONVERSI KE NUMERIK
+    # UBAH MENJADI NUMERIK
     # ======================================================
 
     for col in FEATURE_COLUMNS:
@@ -288,33 +626,60 @@ def select_features(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     # ======================================================
-    # HAPUS DATA YANG TIDAK VALID
+    # HAPUS DATA TIDAK VALID
     # ======================================================
 
     feature_df = feature_df.dropna()
 
+    # ======================================================
+    # RESET INDEX
+    # ======================================================
+
+    feature_df = feature_df.reset_index(drop=True)
+
     return feature_df
-    # ==========================================================
-# MIN MAX NORMALIZATION
+
+# ==========================================================
+# MIN-MAX NORMALIZATION
 # ==========================================================
 
-def minmax_normalization(feature_df: pd.DataFrame) -> pd.DataFrame:
+def minmax_normalization(feature_df: pd.DataFrame):
     """
-    Melakukan normalisasi Min-Max terhadap
-    variabel penelitian.
+    Melakukan normalisasi menggunakan
+    Min-Max Normalization.
+
+    Rumus:
+
+        X' = (X - Xmin) / (Xmax - Xmin)
     """
+
+    if feature_df.empty:
+
+        raise ValueError(
+
+            "Data feature kosong."
+
+        )
 
     scaler = MinMaxScaler()
 
-    normalized = scaler.fit_transform(feature_df)
+    normalized = scaler.fit_transform(
 
-    normalized_df = pd.DataFrame(
-        normalized,
-        columns=feature_df.columns
+        feature_df
+
     )
 
-    return normalized_df
+    normalized_df = pd.DataFrame(
 
+        normalized,
+
+        columns=feature_df.columns,
+
+        index=feature_df.index
+
+    )
+
+    return normalized_df, scaler
 
 # ==========================================================
 # PREPROCESS DATASET
@@ -322,13 +687,15 @@ def minmax_normalization(feature_df: pd.DataFrame) -> pd.DataFrame:
 
 def preprocess_dataset(df: pd.DataFrame):
     """
-    Pipeline preprocessing lengkap.
+    Pipeline preprocessing.
 
     Tahapan:
+    --------
     1. Data Cleaning
-    2. Feature Engineering
-    3. Pemilihan Variabel
-    4. Min-Max Normalization
+    2. Split Produk
+    3. Agregasi Produk
+    4. Feature Selection
+    5. Min-Max Normalization
     """
 
     # ======================================================
@@ -338,41 +705,71 @@ def preprocess_dataset(df: pd.DataFrame):
     cleaned_df = clean_data(df)
 
     # ======================================================
-    # FEATURE ENGINEERING
+    # SPLIT PRODUK
     # ======================================================
 
-    engineered_df = feature_engineering(cleaned_df)
+    product_detail_df = split_products(cleaned_df)
 
     # ======================================================
-    # VARIABEL PENELITIAN
+    # AGREGASI PRODUK
     # ======================================================
 
-    feature_df = select_features(engineered_df)
+    product_dataset = build_product_dataset(
+        product_detail_df
+    )
 
     # ======================================================
-    # SAMAKAN DATASET
+    # FEATURE SELECTION
+    # ======================================================
+
+    feature_df = select_features(
+        product_dataset
+    )
+
+    # ======================================================
+    # SAMAKAN INDEX
     # ======================================================
 
     valid_index = feature_df.index
 
-    engineered_df = (
-        engineered_df
+    product_dataset = (
+
+        product_dataset
+
         .loc[valid_index]
-        .copy()
+
         .reset_index(drop=True)
+
     )
 
     feature_df = (
+
         feature_df
+
         .reset_index(drop=True)
+
     )
 
     # ======================================================
-    # MIN MAX NORMALIZATION
+    # NORMALISASI
     # ======================================================
 
-    normalized_df = minmax_normalization(
-        feature_df
+    normalized_df, scaler = (
+
+        minmax_normalization(
+
+            feature_df
+
+        )
+
+    )
+
+    normalized_df = (
+
+        normalized_df
+
+        .reset_index(drop=True)
+
     )
 
     # ======================================================
@@ -381,10 +778,12 @@ def preprocess_dataset(df: pd.DataFrame):
 
     return (
 
-        engineered_df,
+        product_dataset,
 
         feature_df,
 
-        normalized_df
+        normalized_df,
+
+        scaler
 
     )
