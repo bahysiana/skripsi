@@ -18,15 +18,12 @@ def show_login():
     st.markdown(
         """
         <div class="section-title">
-            <h2 style="text-align:center;">
-                🍽️ Buffet The Padang Pasir
-            </h2>
+            <h2>🍽️ Buffet The Padang Pasir</h2>
+        </div>
 
-            <div class="section-subtitle" style="text-align:center;">
-                Sistem Analisis Pola Transaksi Shopee Food
-                <br>
-                Menggunakan Metode K-Means Clustering
-            </div>
+        <div class="section-subtitle">
+            Sistem Analisis Pola Transaksi Shopee Food<br>
+            Menggunakan Metode K-Means Clustering
         </div>
         """,
         unsafe_allow_html=True
@@ -42,38 +39,37 @@ def show_login():
 
     with center:
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
+        with st.container(border=True):
 
-        st.subheader("🔐 Login Administrator")
+            st.subheader("🔐 Login Administrator")
 
-        st.caption(
-            "Silakan login menggunakan akun administrator untuk mengakses sistem."
-        )
-
-        with st.form("login_form"):
-
-            username = st.text_input(
-                "Username",
-                placeholder="Masukkan Username"
+            st.caption(
+                "Silakan login menggunakan akun administrator untuk mengakses sistem."
             )
 
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Masukkan Password"
-            )
+            with st.form("login_form"):
 
-            st.write("")
+                username = st.text_input(
+                    "Username",
+                    placeholder="Masukkan Username"
+                )
 
-            login = st.form_submit_button(
-                "Masuk",
-                use_container_width=True
-            )
+                password = st.text_input(
+                    "Password",
+                    type="password",
+                    placeholder="Masukkan Password"
+                )
 
-        st.markdown("</div>", unsafe_allow_html=True)
+                st.write("")
+
+                login = st.form_submit_button(
+                    "Masuk",
+                    type="primary",
+                    use_container_width=True
+                )
 
     # ======================================================
-    # PROSES LOGIN
+    # LOGIN
     # ======================================================
 
     if login:
@@ -96,6 +92,11 @@ def show_login():
 
     st.write("")
 
-    st.caption(
-        "© 2026 Buffet The Padang Pasir"
+    st.markdown(
+        """
+        <div style="text-align:center;color:#6c757d;">
+            © 2026 Buffet The Padang Pasir
+        </div>
+        """,
+        unsafe_allow_html=True
     )
