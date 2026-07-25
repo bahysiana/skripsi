@@ -2,7 +2,7 @@ import pandas as pd
 from io import BytesIO
 
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
@@ -12,8 +12,7 @@ from reportlab.platypus import (
     Paragraph,
     Spacer,
     Table,
-    TableStyle,
-    PageBreak,
+    TableStyle
 )
 
 # ==========================================================
@@ -50,7 +49,7 @@ def export_excel(df: pd.DataFrame):
 
 
 # ==========================================================
-# STYLE
+# STYLE PDF
 # ==========================================================
 
 def get_styles():
@@ -60,7 +59,7 @@ def get_styles():
         "title": ParagraphStyle(
             name="Title",
             fontName="Helvetica-Bold",
-            fontSize=14,
+            fontSize=15,
             alignment=TA_CENTER,
             spaceAfter=8,
         ),
@@ -70,31 +69,22 @@ def get_styles():
             fontName="Helvetica-Bold",
             fontSize=11,
             alignment=TA_CENTER,
+            leading=16,
             spaceAfter=10,
-            leading=15,
         ),
 
         "heading": ParagraphStyle(
             name="Heading",
             fontName="Helvetica-Bold",
             fontSize=12,
-            spaceBefore=10,
-            spaceAfter=8,
-        ),
-
-        "normal": ParagraphStyle(
-            name="Normal",
-            fontName="Helvetica",
-            fontSize=10,
-            alignment=TA_JUSTIFY,
-            leading=18,
+            spaceAfter=10,
         ),
 
         "table": ParagraphStyle(
             name="Table",
             fontName="Helvetica",
-            fontSize=9,
-            leading=12,
+            fontSize=8,
+            leading=10,
         ),
 
     }
@@ -127,30 +117,11 @@ def add_page_number(canvas, doc):
 
     canvas.restoreState()
 
-
 # ==========================================================
 # EXPORT PDF
 # ==========================================================
 
-def export_pdf(
-
-    summary_df,
-
-    centroid_df,
-
-    profile_df,
-
-    total_data,
-
-    tinggi,
-
-    normal,
-
-    tinggi_pct,
-
-    normal_pct,
-
-):
+def export_pdf(result_df):
 
     output = BytesIO()
 
@@ -160,429 +131,281 @@ def export_pdf(
 
         pagesize=A4,
 
-        leftMargin=2.2 * cm,
+        leftMargin=2 * cm,
 
-        rightMargin=2.2 * cm,
+        rightMargin=2 * cm,
 
         topMargin=2.5 * cm,
 
-        bottomMargin=2.2 * cm,
+        bottomMargin=2 * cm,
 
     )
 
     styles = get_styles()
 
     story = []
-        # ==========================================================
-    # HALAMAN 1
+
+    # ==========================================================
+    # JUDUL LAPORAN
     # ==========================================================
 
     story.append(
+
         Paragraph(
+
             "LAPORAN HASIL ANALISIS",
+
             styles["title"]
+
         )
+
     )
 
     story.append(
+
         Paragraph(
+
             "Analisis Pola Transaksi Shopee Food Menggunakan "
             "Metode K-Means Clustering Berdasarkan Data Pemesanan "
             "pada Toko Buffet The Padang Pasir",
+
             styles["subtitle"]
+
         )
+
     )
+
     # ==========================================================
     # GARIS PEMISAH
     # ==========================================================
 
     garis = Table(
+
         [[""]],
-        colWidths=[16.3 * cm]
+
+        colWidths=[16.5 * cm]
+
     )
 
     garis.setStyle(
+
         TableStyle([
+
             ("LINEBELOW", (0, 0), (-1, 0), 2, colors.black),
+
             ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+
             ("TOPPADDING", (0, 0), (-1, -1), 0),
+
         ])
+
     )
 
     story.append(garis)
 
-    story.append(
-        Spacer(1, 0.35 * cm)
-    )
-
+    story.append(Spacer(1, 0.5 * cm))
 
     # ==========================================================
-    # RINGKASAN
+    # SUB JUDUL
     # ==========================================================
 
     story.append(
+
         Paragraph(
-            "Ringkasan Hasil Analisis",
+
+            "Hasil Akhir Clustering Produk",
+
             styles["heading"]
+
         )
+
     )
 
-    data_ringkasan = [
+    story.append(
+
+        Spacer(1, 0.2 * cm)
+
+    )
+
+    # ==========================================================
+    # MENYIAPKAN DATA
+    # ==========================================================
+
+    pdf_df = result_df.copy()
+
+    pdf_df = pdf_df[
+        [
+            "Produk",
+            "Jumlah_Item_Produk",
+            "Total_Pendapatan",
+            "Hasil Cluster"
+        ]
+    ]
+
+    pdf_df.columns = [
+        "Produk",
+        "Jumlah Item",
+        "Total Pendapatan",
+        "Hasil Cluster"
+    ]
+
+    # ==========================================================
+    # FORMAT TOTAL PENDAPATAN
+    # ==========================================================
+
+    pdf_df["Total Pendapatan"] = (
+
+        pdf_df["Total Pendapatan"]
+
+        .fillna(0)
+
+        .astype(int)
+
+        .map(
+
+            lambda x: f"{x:,}".replace(",", ".")
+
+        )
+
+    )
+
+    # ==========================================================
+    # MEMBUAT HEADER TABEL
+    # ==========================================================
+
+    table_data = [
 
         [
 
-            Paragraph("<b>Nama Cluster</b>", styles["table"]),
+            Paragraph("<b>No</b>", styles["table"]),
 
-            Paragraph("<b>Jumlah</b>", styles["table"]),
+            Paragraph("<b>Produk</b>", styles["table"]),
 
-            Paragraph("<b>Persentase (%)</b>", styles["table"])
+            Paragraph("<b>Jumlah Item</b>", styles["table"]),
 
-        ],
+            Paragraph("<b>Total Pendapatan</b>", styles["table"]),
 
-        [
-
-            Paragraph(
-                "Pola Transaksi dengan Beban Pelayanan Tinggi",
-                styles["table"]
-            ),
-
-            Paragraph(
-                str(tinggi),
-                styles["table"]
-            ),
-
-            Paragraph(
-                f"{tinggi_pct:.2f}",
-                styles["table"]
-            )
-
-        ],
-
-        [
-
-            Paragraph(
-                "Pola Transaksi dengan Beban Pelayanan Rendah",
-                styles["table"]
-            ),
-
-            Paragraph(
-                str(normal),
-                styles["table"]
-            ),
-
-            Paragraph(
-                f"{normal_pct:.2f}",
-                styles["table"]
-            )
+            Paragraph("<b>Hasil Cluster</b>", styles["table"])
 
         ]
 
     ]
 
-    tabel_ringkasan = Table(
+    # ==========================================================
+    # MENAMBAHKAN DATA KE TABEL
+    # ==========================================================
 
-        data_ringkasan,
+    for index, row in pdf_df.iterrows():
 
-        colWidths=[10 * cm, 2.5 * cm, 3 * cm]
+        table_data.append(
+
+            [
+
+                str(index + 1),
+
+                Paragraph(
+                    str(row["Produk"]),
+                    styles["table"]
+                ),
+
+                str(row["Jumlah Item"]),
+
+                str(row["Total Pendapatan"]),
+
+                Paragraph(
+                    str(row["Hasil Cluster"]),
+                    styles["table"]
+                )
+
+            ]
+
+        )
+
+    # ==========================================================
+    # MEMBUAT TABEL
+    # ==========================================================
+
+    tabel = Table(
+
+        table_data,
+
+        repeatRows=1,
+
+        colWidths=[
+
+            1 * cm,      # No
+
+            6 * cm,      # Produk
+
+            2.5 * cm,    # Jumlah Item
+
+            3.5 * cm,    # Total Pendapatan
+
+            5 * cm       # Hasil Cluster
+
+        ]
 
     )
 
-    tabel_ringkasan.setStyle(
+    # ==========================================================
+    # STYLE TABEL
+    # ==========================================================
+
+    tabel.setStyle(
 
         TableStyle([
 
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
+            # Header
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAEAEA")),
+
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
 
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
 
-            ("ALIGN", (1, 1), (-1, -1), "CENTER"),
+            ("FONTSIZE", (0, 0), (-1, 0), 9),
+
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+
+            ("TOPPADDING", (0, 0), (-1, 0), 8),
+
+            # Isi tabel
+            ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+
+            ("FONTSIZE", (0, 1), (-1, -1), 8),
+
+            ("TOPPADDING", (0, 1), (-1, -1), 6),
+
+            ("BOTTOMPADDING", (0, 1), (-1, -1), 6),
+
+            # Border
+            ("GRID", (0, 0), (-1, -1), 0.8, colors.black),
+
+            ("BOX", (0, 0), (-1, -1), 1, colors.black),
+
+            # Alignment
+            ("ALIGN", (0, 0), (0, -1), "CENTER"),     # No
+
+            ("ALIGN", (2, 1), (3, -1), "CENTER"),     # Jumlah Item & Pendapatan
+
+            ("ALIGN", (1, 1), (1, -1), "LEFT"),       # Produk
+
+            ("ALIGN", (4, 1), (4, -1), "LEFT"),       # Cluster
 
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
 
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
-
-            ("TOPPADDING", (0, 0), (-1, -1), 8),
-
         ])
 
     )
 
-    story.append(tabel_ringkasan)
-
-    story.append(Spacer(1, 0.8 * cm))
+    story.append(tabel)
 
     # ==========================================================
-    # KESIMPULAN
+    # SPASI AKHIR
     # ==========================================================
 
     story.append(
 
-        Paragraph(
-
-            "Kesimpulan",
-
-            styles["heading"]
-
-        )
-
-    )
-
-    story.append(
-
-        Paragraph(
-
-            f"""
-            Berdasarkan hasil analisis terhadap <b>{total_data}</b> data
-            transaksi Shopee Food menggunakan metode K-Means Clustering,
-            diperoleh dua kelompok transaksi.
-
-            Kelompok pertama yaitu
-            <b>Pola Transaksi dengan Beban Pelayanan Tinggi</b>
-            sebanyak <b>{tinggi}</b> transaksi
-            (<b>{tinggi_pct:.2f}%</b>).
-
-            Kelompok kedua yaitu
-            <b>Pola Transaksi dengan Beban Pelayanan Rendah</b>
-            sebanyak <b>{normal}</b> transaksi
-            (<b>{normal_pct:.2f}%</b>).
-
-            Hasil pengelompokan ini dapat dijadikan sebagai dasar
-            dalam mendukung pengambilan keputusan operasional,
-            pembagian sumber daya, serta peningkatan kualitas
-            pelayanan pada Buffet The Padang Pasir.
-            """,
-
-            styles["normal"]
-
-        )
-
-    )
-
-    story.append(
-
-        PageBreak()
-
-    )
-        # ==========================================================
-    # HALAMAN 2
-    # ==========================================================
-
-    story.append(
-
-        Paragraph(
-
-            "Interpretasi Hasil Clustering",
-
-            styles["title"]
-
-        )
-
-    )
-
-    story.append(
-
-        Spacer(1, 0.5 * cm)
-
-    )
-
-    story.append(
-
-        Paragraph(
-
-            "Interpretasi hasil clustering digunakan untuk memberikan "
-            "gambaran karakteristik dari setiap kelompok transaksi "
-            "beserta rekomendasi yang dapat dijadikan dasar dalam "
-            "pengambilan keputusan operasional.",
-
-            styles["normal"]
-
-        )
-
-    )
-
-    story.append(
-
-        Spacer(1, 0.5 * cm)
-
-    )
-
-    # ==========================================================
-    # TABEL INTERPRETASI
-    # ==========================================================
-
-    data_interpretasi = [
-
-        [
-
-            Paragraph("<b>Nama Cluster</b>", styles["table"]),
-
-            Paragraph("<b>Karakteristik</b>", styles["table"]),
-
-            Paragraph("<b>Rekomendasi</b>", styles["table"])
-
-        ],
-
-        [
-
-            Paragraph(
-
-                "Pola Transaksi dengan Beban Pelayanan Tinggi",
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                """
-                • Nilai transaksi relatif tinggi.<br/>
-                • Jumlah pesanan lebih banyak.<br/>
-                • Variasi menu lebih beragam.<br/>
-                • Waktu persiapan relatif lebih lama.
-                """,
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                """
-                • Prioritaskan pelayanan transaksi.<br/>
-                • Pastikan stok bahan baku tersedia.<br/>
-                • Atur pembagian tugas karyawan.<br/>
-                • Pantau waktu persiapan pesanan.<br/>
-                • Jadikan cluster ini sebagai prioritas operasional.
-                """,
-
-                styles["table"]
-
-            )
-
-        ],
-
-        [
-
-            Paragraph(
-
-                "Pola Transaksi dengan Beban Pelayanan Rendah",
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                """
-                • Nilai transaksi relatif rendah.<br/>
-                • Jumlah pesanan lebih sedikit.<br/>
-                • Variasi menu lebih sederhana.<br/>
-                • Waktu persiapan relatif singkat.
-                """,
-
-                styles["table"]
-
-            ),
-
-            Paragraph(
-
-                """
-                • Pertahankan kualitas pelayanan.<br/>
-                • Kelola sumber daya secara efisien.<br/>
-                • Lakukan evaluasi berkala.<br/>
-                • Pertahankan standar operasional.<br/>
-                • Tetap menjaga kepuasan pelanggan.
-                """,
-
-                styles["table"]
-
-            )
-
-        ]
-
-    ]
-
-    tabel_interpretasi = Table(
-
-        data_interpretasi,
-
-        colWidths=[5 * cm, 6 * cm, 6 * cm]
-
-    )
-
-    tabel_interpretasi.setStyle(
-
-        TableStyle([
-
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAEAEA")),
-
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
-
-            ("TOPPADDING", (0, 0), (-1, -1), 8),
-
-            ("LEFTPADDING", (0, 0), (-1, -1), 6),
-
-            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-
-        ])
-
-    )
-
-    story.append(
-
-        tabel_interpretasi
-
-    )
-
-    story.append(
-
-        Spacer(1, 0.7 * cm)
-
-    )
-
-    # ==========================================================
-    # PENUTUP
-    # ==========================================================
-
-    story.append(
-
-        Paragraph(
-
-            "Penutup",
-
-            styles["heading"]
-
-        )
-
-    )
-
-    story.append(
-
-        Paragraph(
-
-            """
-            Hasil analisis clustering ini diharapkan dapat membantu
-            Buffet The Padang Pasir dalam memahami pola transaksi
-            pelanggan sehingga dapat digunakan sebagai dasar dalam
-            menentukan prioritas pelayanan, pengelolaan stok bahan baku,
-            pembagian sumber daya, serta meningkatkan efektivitas
-            operasional berdasarkan karakteristik transaksi yang
-            telah terbentuk.
-            """,
-
-            styles["normal"]
-
-        )
+        Spacer(1, 0.3 * cm)
 
     )
 
@@ -599,6 +422,10 @@ def export_pdf(
         onLaterPages=add_page_number
 
     )
+
+    # ==========================================================
+    # KEMBALIKAN FILE PDF
+    # ==========================================================
 
     output.seek(0)
 
