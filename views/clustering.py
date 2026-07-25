@@ -537,6 +537,12 @@ Dengan adanya pengelompokan ini, pemilik usaha dapat lebih mudah menentukan prio
         }
     )
 
+    # ======================================================
+    # SIMPAN HASIL AKHIR UNTUK DOWNLOAD
+    # ======================================================
+
+    st.session_state["final_cluster_df"] = final_df
+
     st.dataframe(
         final_df,
         hide_index=True,
