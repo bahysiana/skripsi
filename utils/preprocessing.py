@@ -172,8 +172,8 @@ PRODUCT_MAPPING = {
     "Soto Medan": "Soto Medan",
     "soto medan": "Soto Medan",
 
-    "Soto Medan Tanpa Nasi": "Soto Medan Tanpa Nasi",
-    "soto medan tanpa nasi": "Soto Medan Tanpa Nasi"
+    "Soto Medan Tanpa Nasi": "Soto Medan",
+    "soto medan tanpa nasi": "Soto Medan"
 }
 
 
