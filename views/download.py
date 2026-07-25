@@ -62,6 +62,8 @@ Silakan lakukan proses clustering terlebih dahulu.
 
     cluster_df = st.session_state["cluster_df"]
 
+    final_cluster_df = st.session_state["final_cluster_df"]
+
     centroid_df = st.session_state["centroid_df"]
 
     summary_df = cluster_summary(cluster_df)
@@ -141,23 +143,7 @@ mudah dipahami oleh pihak
     )
 
     pdf = export_pdf(
-
-        summary_df,
-
-        centroid_df,
-
-        profile_df,
-
-        total_data,
-
-        tinggi,
-
-        normal,
-
-        tinggi_pct,
-
-        normal_pct
-
+        final_cluster_df
     )
 
     st.download_button(
