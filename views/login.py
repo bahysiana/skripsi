@@ -39,10 +39,10 @@ def show_login():
 
         with st.container(border=True):
 
-            st.subheader("🔐 Login Administrator")
+            st.subheader("🔐 Login Admin")
 
             st.caption(
-                "Silakan login menggunakan akun administrator untuk mengakses sistem."
+                "Silakan login menggunakan akun admin untuk mengakses sistem."
             )
 
             with st.form("login_form"):
