@@ -115,10 +115,9 @@ PRODUCT_MAPPING = {
 
     "Lontong Gulai Toco": "Lontong Gulai Toco",
     "lontong gulai toco": "Lontong Gulai Toco",
-    "Lontong Gulai Toco + Telur": "Lontong Gulai Toco",
 
-    "Lontong Gulai Toco + Telur": "Lontong Gulai Toco + Telur",
-    "lontong gulai toco + telur": "Lontong Gulai Toco + Telur",
+    "Lontong Gulai Toco + Telur": "Lontong Gulai Toco",
+    "lontong gulai toco + telur": "Lontong Gulai Toco",
 
     "Lontong Kikil Gulai Nangka": "Lontong Kikil Gulai Nangka Komplit",
     "Lontong Kikil Gulai Nangka Komplit": "Lontong Kikil Gulai Nangka Komplit",
@@ -448,7 +447,7 @@ def split_products(df: pd.DataFrame) -> pd.DataFrame:
 
                 convert_number(x)
 
-                for x in str(harga_text).split(",")
+                for x in re.split(r"[;,]", str(harga_text))
 
                 if str(x).strip() != ""
 
