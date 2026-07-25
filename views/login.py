@@ -10,13 +10,14 @@ from utils.auth import verify_login
 st.markdown("""
 <style>
 
-/* Mengurangi ruang atas */
+/* Jarak halaman */
 .block-container{
-    padding-top:2rem;
-    padding-bottom:2rem;
+    padding-top:1.5rem;
+    padding-bottom:1rem;
+    max-width:1200px;
 }
 
-/* Hilangkan menu dan footer bawaan */
+/* Hilangkan menu */
 #MainMenu{
     visibility:hidden;
 }
@@ -25,38 +26,34 @@ footer{
     visibility:hidden;
 }
 
+header{
+    visibility:hidden;
+}
+
 /* Judul */
 .login-title{
     text-align:center;
-    font-size:40px;
-    font-weight:bold;
-    color:#222222;
+    font-size:36px;
+    font-weight:700;
+    color:#222;
     margin-bottom:8px;
 }
 
 /* Subtitle */
 .login-subtitle{
     text-align:center;
-    font-size:18px;
-    color:#666666;
-    margin-bottom:30px;
-}
-
-/* Card */
-.login-card{
-    background:white;
-    padding:35px;
-    border-radius:15px;
-    border:1px solid #EAEAEA;
-    box-shadow:0px 4px 20px rgba(0,0,0,0.08);
+    color:#666;
+    font-size:16px;
+    line-height:1.7;
+    margin-bottom:25px;
 }
 
 /* Footer */
 .footer-login{
     text-align:center;
-    color:#888888;
-    font-size:13px;
+    color:#888;
     margin-top:25px;
+    font-size:13px;
 }
 
 </style>
@@ -78,8 +75,12 @@ def show_login():
 
     st.markdown(
         """
+        <div style="text-align:center;font-size:70px;">
+            🍽️
+        </div>
+
         <div class="login-title">
-            🍽️ Buffet The Padang Pasir
+            Buffet The Padang Pasir
         </div>
 
         <div class="login-subtitle">
@@ -91,49 +92,45 @@ def show_login():
     )
 
     # ======================================================
-    # FORM DI TENGAH
+    # CARD LOGIN
     # ======================================================
 
-    left, center, right = st.columns([1.3, 2, 1.3])
+    left, center, right = st.columns([1.4,1.6,1.4])
 
     with center:
 
-        st.markdown(
-            """
-            <div class="login-card">
-            <h3 style="text-align:center;margin-bottom:25px;">
-                🔐 Login Administrator
-            </h3>
-            """,
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
 
-        with st.form("login_form"):
-
-            username = st.text_input(
-                "Username",
-                placeholder="Masukkan Username"
+            st.markdown(
+                "<h3 style='text-align:center;'>🔐 Login Administrator</h3>",
+                unsafe_allow_html=True
             )
 
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Masukkan Password"
-            )
+            st.write("")
 
-            login = st.form_submit_button(
-                "🔓 Login",
-                type="primary",
-                use_container_width=True
-            )
+            with st.form("login_form"):
 
-        st.markdown(
-            "</div>",
-            unsafe_allow_html=True
-        )
+                username = st.text_input(
+                    "Username",
+                    placeholder="Masukkan Username"
+                )
+
+                password = st.text_input(
+                    "Password",
+                    type="password",
+                    placeholder="Masukkan Password"
+                )
+
+                st.write("")
+
+                login = st.form_submit_button(
+                    "🔓 Login",
+                    type="primary",
+                    use_container_width=True
+                )
 
     # ======================================================
-    # PROSES LOGIN
+    # LOGIN
     # ======================================================
 
     if login:
@@ -142,17 +139,13 @@ def show_login():
 
             st.session_state.logged_in = True
 
-            st.success(
-                "Login berhasil."
-            )
+            st.success("Login berhasil.")
 
             st.rerun()
 
         else:
 
-            st.error(
-                "Username atau Password salah."
-            )
+            st.error("Username atau Password salah.")
 
     # ======================================================
     # FOOTER
