@@ -9,12 +9,11 @@ from utils.auth import verify_login
 st.markdown("""
 <style>
 
-/* =========================
+/* =====================================================
    HALAMAN
-========================= */
+===================================================== */
 
 .block-container{
-    max-width:500px;
     padding-top:2rem;
     padding-bottom:2rem;
 }
@@ -33,40 +32,30 @@ footer{
     visibility:hidden;
 }
 
-/* Logo */
-
-.logo{
-    text-align:center;
-    font-size:60px;
-    margin-bottom:5px;
-}
-
-/* Judul */
+/* =====================================================
+   HEADER
+===================================================== */
 
 .title{
     text-align:center;
-    font-size:30px;
+    font-size:34px;
     font-weight:700;
-    color:#222;
+    color:#222222;
     margin-bottom:5px;
 }
 
-/* Subtitle */
-
 .subtitle{
     text-align:center;
-    font-size:15px;
-    color:#666;
+    font-size:16px;
+    color:#666666;
     line-height:1.7;
     margin-bottom:25px;
 }
 
-/* Footer */
-
 .footer{
     text-align:center;
-    color:#888;
-    margin-top:25px;
+    color:#888888;
+    margin-top:20px;
     font-size:13px;
 }
 
@@ -88,43 +77,52 @@ def show_login():
     # ======================================================
 
     st.markdown("""
-
 <div class="title">
-Buffet The Padang Pasir
+🍽️ Buffet The Padang Pasir
 </div>
 
+<div class="subtitle">
+Sistem Analisis Pola Transaksi Shopee Food<br>
+Menggunakan Metode K-Means Clustering
+</div>
 """, unsafe_allow_html=True)
 
+    st.write("")
+
     # ======================================================
-    # CARD LOGIN
+    # LOGIN DI TENGAH
     # ======================================================
 
-    with st.container(border=True):
+    col1, col2, col3 = st.columns([1.2, 2, 1.2])
 
-        st.subheader("🔐 Login Administrator")
+    with col2:
 
-        st.write("")
+        with st.container(border=True):
 
-        with st.form("login_form"):
-
-            username = st.text_input(
-                "Username",
-                placeholder="Masukkan Username"
-            )
-
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Masukkan Password"
-            )
+            st.subheader("🔐 Login Administrator")
 
             st.write("")
 
-            login = st.form_submit_button(
-                "Masuk",
-                type="primary",
-                use_container_width=True
-            )
+            with st.form("login_form"):
+
+                username = st.text_input(
+                    "Username",
+                    placeholder="Masukkan Username"
+                )
+
+                password = st.text_input(
+                    "Password",
+                    type="password",
+                    placeholder="Masukkan Password"
+                )
+
+                st.write("")
+
+                login = st.form_submit_button(
+                    "Masuk",
+                    type="primary",
+                    use_container_width=True
+                )
 
     # ======================================================
     # LOGIN
@@ -147,6 +145,8 @@ Buffet The Padang Pasir
     # ======================================================
     # FOOTER
     # ======================================================
+
+    st.write("")
 
     st.markdown("""
 <div class="footer">
