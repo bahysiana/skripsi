@@ -88,9 +88,6 @@ def show_login():
     # ======================================================
 
     st.markdown("""
-<div class="logo">
-🍽️
-</div>
 
 <div class="title">
 Buffet The Padang Pasir
