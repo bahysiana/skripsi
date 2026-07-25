@@ -10,19 +10,19 @@ from utils.auth import verify_login
 st.markdown("""
 <style>
 
-/* Jarak halaman */
+/* =========================
+   HALAMAN
+========================= */
+
 .block-container{
+    max-width:1200px;
     padding-top:1.5rem;
     padding-bottom:1rem;
-    max-width:1200px;
 }
 
-/* Hilangkan menu */
+/* Hilangkan menu bawaan */
+
 #MainMenu{
-    visibility:hidden;
-}
-
-footer{
     visibility:hidden;
 }
 
@@ -30,30 +30,56 @@ header{
     visibility:hidden;
 }
 
-/* Judul */
-.login-title{
-    text-align:center;
-    font-size:36px;
-    font-weight:700;
-    color:#222;
-    margin-bottom:8px;
+footer{
+    visibility:hidden;
 }
 
-/* Subtitle */
-.login-subtitle{
+/* =========================
+   HEADER
+========================= */
+
+.logo{
     text-align:center;
+    font-size:60px;
+    margin-bottom:-10px;
+}
+
+.title{
+    text-align:center;
+    font-size:34px;
+    font-weight:700;
+    color:#222;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:17px;
     color:#666;
-    font-size:16px;
-    line-height:1.7;
+    line-height:1.8;
     margin-bottom:25px;
 }
 
-/* Footer */
-.footer-login{
+/* =========================
+   LOGIN TITLE
+========================= */
+
+.login-title{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
     text-align:center;
     color:#888;
-    margin-top:25px;
     font-size:13px;
+    margin-top:20px;
 }
 
 </style>
@@ -70,39 +96,45 @@ def show_login():
         st.session_state.logged_in = False
 
     # ======================================================
-    # HEADER
+    # LAYOUT
     # ======================================================
 
-    st.markdown(
-        """
-        <div style="text-align:center;font-size:70px;">
-            🍽️
-        </div>
+    kiri, tengah, kanan = st.columns([1.3, 1.4, 1.3])
 
-        <div class="login-title">
-            Buffet The Padang Pasir
-        </div>
+    with tengah:
 
-        <div class="login-subtitle">
-            Sistem Analisis Pola Transaksi Shopee Food<br>
-            Menggunakan Metode K-Means Clustering
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        # ==================================================
+        # HEADER
+        # ==================================================
 
-    # ======================================================
-    # CARD LOGIN
-    # ======================================================
+        st.markdown(
+            """
+            <div class="logo">🍽️</div>
 
-    left, center, right = st.columns([1.4,1.6,1.4])
+            <div class="title">
+                Buffet The Padang Pasir
+            </div>
 
-    with center:
+            <div class="subtitle">
+                Sistem Analisis Pola Transaksi Shopee Food<br>
+                Menggunakan Metode K-Means Clustering
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # ==================================================
+        # CARD
+        # ==================================================
 
         with st.container(border=True):
 
             st.markdown(
-                "<h3 style='text-align:center;'>🔐 Login Administrator</h3>",
+                """
+                <div class="login-title">
+                    🔐 Login Administrator
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
@@ -124,10 +156,19 @@ def show_login():
                 st.write("")
 
                 login = st.form_submit_button(
-                    "🔓 Login",
+                    "Masuk",
                     type="primary",
                     use_container_width=True
                 )
+
+        st.markdown(
+            """
+            <div class="footer">
+                © 2026 Buffet The Padang Pasir
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # ======================================================
     # LOGIN
@@ -146,16 +187,3 @@ def show_login():
         else:
 
             st.error("Username atau Password salah.")
-
-    # ======================================================
-    # FOOTER
-    # ======================================================
-
-    st.markdown(
-        """
-        <div class="footer-login">
-            © 2026 Buffet The Padang Pasir
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
