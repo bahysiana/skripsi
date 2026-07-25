@@ -93,10 +93,6 @@ def show_login():
 Buffet The Padang Pasir
 </div>
 
-<div class="subtitle">
-Sistem Analisis Pola Transaksi Shopee Food<br>
-Menggunakan Metode K-Means Clustering
-</div>
 """, unsafe_allow_html=True)
 
     # ======================================================
