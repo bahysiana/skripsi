@@ -15,6 +15,19 @@ def show_login():
     # HEADER
     # ======================================================
 
+    st.markdown(
+        """
+        <div class="section-title">
+            <h2>🍽️ Buffet The Padang Pasir</h2>
+        </div>
+
+        <div class="section-subtitle">
+            Sistem Analisis Pola Transaksi Shopee Food<br>
+            Menggunakan Metode K-Means Clustering
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.write("")
 
@@ -86,4 +99,4 @@ def show_login():
         </div>
         """,
         unsafe_allow_html=True
-    )v
+    )
