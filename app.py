@@ -141,13 +141,42 @@ Analisis Pola Transaksi Shopee Food
     st.divider()
 
     if st.button(
-        "🚪 Logout",
-        use_container_width=True
-    ):
+    "🚪 Logout",
+    use_container_width=True
+):
 
-        st.session_state.logged_in = False
+    # Hapus seluruh session yang digunakan aplikasi
+    keys = [
 
-        st.rerun()
+        "logged_in",
+
+        "raw_df",
+
+        "cleaned_df",
+
+        "product_dataset",
+
+        "feature_df",
+
+        "normalized_df",
+
+        "cluster_df",
+
+        "centroid_df",
+
+        "scaler"
+
+    ]
+
+    for key in keys:
+
+        if key in st.session_state:
+
+            del st.session_state[key]
+
+    st.session_state.logged_in = False
+
+    st.rerun()
 
     st.caption("Buffet The Padang Pasir")
 
