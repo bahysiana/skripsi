@@ -20,8 +20,8 @@ from utils.auth import initialize_auth
 
 st.set_page_config(
     page_title="Analisis Pola Transaksi Shopee Food",
-    layout="wide",
     page_icon="🍽️",
+    layout="wide",
     initial_sidebar_state="expanded"
 )
 
@@ -68,6 +68,7 @@ if not st.session_state.logged_in:
     show_login()
 
     st.stop()
+
 # =====================================================
 # SIDEBAR
 # =====================================================
@@ -76,7 +77,7 @@ with st.sidebar:
 
     st.markdown(
         """
-### 🍽️Buffet The Padang Pasir🍽️
+### 🍽️ Buffet The Padang Pasir
 
 Analisis Pola Transaksi Shopee Food
         """
@@ -85,9 +86,9 @@ Analisis Pola Transaksi Shopee Food
     st.divider()
 
     selected = option_menu(
-        
+
         menu_title="",
-        
+
         options=[
             "Home",
             "Kelola Data",
@@ -140,43 +141,52 @@ Analisis Pola Transaksi Shopee Food
 
     st.divider()
 
+    # =================================================
+    # LOGOUT
+    # =================================================
+
     if st.button(
-    "🚪 Logout",
-    use_container_width=True
-):
+        "🚪 Logout",
+        use_container_width=True
+    ):
 
-    # Hapus seluruh session yang digunakan aplikasi
-    keys = [
+        session_keys = [
 
-        "logged_in",
+            "logged_in",
 
-        "raw_df",
+            "raw_df",
 
-        "cleaned_df",
+            "cleaned_df",
 
-        "product_dataset",
+            "product_dataset",
 
-        "feature_df",
+            "feature_df",
 
-        "normalized_df",
+            "normalized_df",
 
-        "cluster_df",
+            "cluster_df",
 
-        "centroid_df",
+            "centroid_df",
 
-        "scaler"
+            "summary_df",
 
-    ]
+            "profile_df",
 
-    for key in keys:
+            "scaler"
 
-        if key in st.session_state:
+        ]
 
-            del st.session_state[key]
+        for key in session_keys:
 
-    st.session_state.logged_in = False
+            if key in st.session_state:
 
-    st.rerun()
+                del st.session_state[key]
+
+        st.session_state.logged_in = False
+
+        st.rerun()
+
+    st.divider()
 
     st.caption("Buffet The Padang Pasir")
 
