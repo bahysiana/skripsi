@@ -3,67 +3,6 @@ from utils.auth import verify_login
 
 
 # ==========================================================
-# CSS
-# ==========================================================
-
-st.markdown("""
-<style>
-
-/* =====================================================
-   HALAMAN
-===================================================== */
-
-.block-container{
-    padding-top:2rem;
-    padding-bottom:2rem;
-}
-
-/* Hilangkan menu bawaan */
-
-#MainMenu{
-    visibility:hidden;
-}
-
-header{
-    visibility:hidden;
-}
-
-footer{
-    visibility:hidden;
-}
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.title{
-    text-align:center;
-    font-size:34px;
-    font-weight:700;
-    color:#222222;
-    margin-bottom:5px;
-}
-
-.subtitle{
-    text-align:center;
-    font-size:16px;
-    color:#666666;
-    line-height:1.7;
-    margin-bottom:25px;
-}
-
-.footer{
-    text-align:center;
-    color:#888888;
-    margin-top:20px;
-    font-size:13px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# ==========================================================
 # LOGIN PAGE
 # ==========================================================
 
@@ -76,56 +15,65 @@ def show_login():
     # HEADER
     # ======================================================
 
-    st.markdown("""
-<div class="title">
-🍽️ Buffet The Padang Pasir
-</div>
+    st.markdown(
+        """
+        <div class="section-title">
+            <h2 style="text-align:center;">
+                🍽️ Buffet The Padang Pasir
+            </h2>
 
-<div class="subtitle">
-Sistem Analisis Pola Transaksi Shopee Food<br>
-Menggunakan Metode K-Means Clustering
-</div>
-""", unsafe_allow_html=True)
+            <div class="section-subtitle" style="text-align:center;">
+                Sistem Analisis Pola Transaksi Shopee Food
+                <br>
+                Menggunakan Metode K-Means Clustering
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.write("")
 
     # ======================================================
-    # LOGIN DI TENGAH
+    # LOGIN FORM
     # ======================================================
 
-    col1, col2, col3 = st.columns([1.2, 2, 1.2])
+    left, center, right = st.columns([2, 3, 2])
 
-    with col2:
+    with center:
 
-        with st.container(border=True):
+        st.markdown('<div class="card">', unsafe_allow_html=True)
 
-            st.subheader("🔐 Login Administrator")
+        st.subheader("🔐 Login Administrator")
+
+        st.caption(
+            "Silakan login menggunakan akun administrator untuk mengakses sistem."
+        )
+
+        with st.form("login_form"):
+
+            username = st.text_input(
+                "Username",
+                placeholder="Masukkan Username"
+            )
+
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Masukkan Password"
+            )
 
             st.write("")
 
-            with st.form("login_form"):
+            login = st.form_submit_button(
+                "Masuk",
+                use_container_width=True
+            )
 
-                username = st.text_input(
-                    "Username",
-                    placeholder="Masukkan Username"
-                )
-
-                password = st.text_input(
-                    "Password",
-                    type="password",
-                    placeholder="Masukkan Password"
-                )
-
-                st.write("")
-
-                login = st.form_submit_button(
-                    "Masuk",
-                    type="primary",
-                    use_container_width=True
-                )
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # ======================================================
-    # LOGIN
+    # PROSES LOGIN
     # ======================================================
 
     if login:
@@ -148,8 +96,6 @@ Menggunakan Metode K-Means Clustering
 
     st.write("")
 
-    st.markdown("""
-<div class="footer">
-© 2026 Buffet The Padang Pasir
-</div>
-""", unsafe_allow_html=True)
+    st.caption(
+        "© 2026 Buffet The Padang Pasir"
+    )
