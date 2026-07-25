@@ -18,12 +18,10 @@ def show_login():
     st.markdown(
         """
         <div class="section-title">
-            <h2>🍽️ Buffet The Padang Pasir</h2>
+            <h2></h2>
         </div>
 
         <div class="section-subtitle">
-            Sistem Analisis Pola Transaksi Shopee Food<br>
-            Menggunakan Metode K-Means Clustering
         </div>
         """,
         unsafe_allow_html=True
