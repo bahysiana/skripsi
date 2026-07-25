@@ -236,8 +236,8 @@ def export_pdf(result_df):
     pdf_df = pdf_df[
         [
             "Produk",
-            "Jumlah_Item_Produk",
-            "Total_Pendapatan",
+            "Jumlah Item Produk",
+            "Total Pendapatan",
             "Hasil Cluster"
         ]
     ]
