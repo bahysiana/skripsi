@@ -120,7 +120,7 @@ PRODUCT_MAPPING = {
     "lontong gulai toco + telur": "Lontong Gulai Toco",
 
     "Lontong Kikil Gulai Nangka": "Lontong Kikil Gulai Nangka Komplit",
-    "Lontong Kikil Gulai Nangka Komplit": "Lontong Kikil Gulai Nangka Komplit",
+    "Lontong Kikil Gulai Nangka Komplit": "Lontong Kikil Gulai Nangka (Cubadak) Komplit",
     "lontong kikil gulai nangka": "Lontong Kikil Gulai Nangka Komplit",
     "lontong kikil gulai nangka komplit": "Lontong Kikil Gulai Nangka Komplit",
 
