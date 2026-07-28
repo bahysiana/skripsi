@@ -123,7 +123,7 @@ def add_page_number(canvas, doc):
     )
 
     canvas.drawCentredString(
-        17.1 * cm,
+        16.9 * cm,
         A4[1] - 1 * cm,
         "LAPORAN HASIL ANALISIS"
     )
