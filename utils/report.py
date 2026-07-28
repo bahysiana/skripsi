@@ -1,5 +1,6 @@
 import pandas as pd
 from io import BytesIO
+from datetime import datetime
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -89,14 +90,44 @@ def get_styles():
 
     }
 
-
 # ==========================================================
-# FOOTER
+# HEADER & FOOTER
 # ==========================================================
 
 def add_page_number(canvas, doc):
 
     canvas.saveState()
+
+    # ==========================
+    # HEADER
+    # ==========================
+
+    tanggal_cetak = datetime.now().strftime("%d/%m/%Y, %H:%M")
+
+    # Tanggal (Kiri Atas)
+    canvas.setFont("Helvetica", 9)
+
+    canvas.drawString(
+        2 * cm,
+        A4[1] - 1 * cm,
+        tanggal_cetak
+    )
+
+    # Judul Header (Tengah Atas)
+    canvas.setFont(
+        "Helvetica-Bold",
+        9
+    )
+
+    canvas.drawCentredString(
+        A4[0] / 2,
+        A4[1] - 1 * cm,
+        "LAPORAN HASIL ANALISIS"
+    )
+
+    # ==========================
+    # FOOTER
+    # ==========================
 
     canvas.setFont(
         "Helvetica",
@@ -135,7 +166,7 @@ def export_pdf(result_df):
 
         rightMargin=2 * cm,
 
-        topMargin=2.5 * cm,
+        topMargin=3.2 * cm,
 
         bottomMargin=2 * cm,
 
