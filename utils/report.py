@@ -1,6 +1,7 @@
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -102,7 +103,9 @@ def add_page_number(canvas, doc):
     # HEADER
     # ==========================
 
-    tanggal_cetak = datetime.now().strftime("%d/%m/%Y, %H:%M")
+    tanggal_cetak = datetime.now(
+        ZoneInfo("Asia/Jakarta")
+    ).strftime("%d/%m/%Y, %H:%M")
 
     # Tanggal (Kiri Atas)
     canvas.setFont("Helvetica", 9)
@@ -120,7 +123,7 @@ def add_page_number(canvas, doc):
     )
 
     canvas.drawCentredString(
-        A4[0] / 2,
+        12.5 * cm,
         A4[1] - 1 * cm,
         "LAPORAN HASIL ANALISIS"
     )
