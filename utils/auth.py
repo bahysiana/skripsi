@@ -88,7 +88,7 @@ def create_default_admin():
                 """,
                 (
                     "admin",
-                    hash_password("admin123")
+                    hash_password("admin123baru123")
                 )
             )
 
