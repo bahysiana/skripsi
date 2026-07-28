@@ -166,7 +166,7 @@ def export_pdf(result_df):
 
         rightMargin=2 * cm,
 
-        topMargin=3.2 * cm,
+        topMargin=2.2 * cm,
 
         bottomMargin=2 * cm,
 
